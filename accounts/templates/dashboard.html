@@ -60,7 +60,11 @@
                 <div class="card">
                     <h3>{{ course.course_name }}</h3>
                     <p>Total Marks: {{ course.total_marks }}</p>
-                    <a href="{% url 'take_exam' course.id %}" class="btn-primary">Take Exam</a>
+                    {% if course.id in taken_exam_ids %}
+                        <span class="btn-primary" style="background-color: #9ca3af; cursor: not-allowed;">Completed</span>
+                    {% else %}
+                        <a href="{% url 'take_exam' course.id %}" class="btn-primary">Take Exam</a>
+                    {% endif %}
                 </div>
             {% empty %}
                 <p style="color: #6b7280; grid-column: 1 / -1;">No exams available right now. Check back later!</p>

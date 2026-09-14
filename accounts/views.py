@@ -61,16 +61,23 @@ def logout_view(request):
 def dashboard(request):
     courses = Course.objects.all()
     past_results = Result.objects.filter(student=request.user).order_by('-date_taken')
+    taken_exam_ids = past_results.values_list('exam_id', flat=True)
 
     context = {
         'courses': courses,
-        'past_results': past_results
+        'past_results': past_results,
+        'taken_exam_ids': taken_exam_ids
         }
     return render(request, 'dashboard.html', context)
 
 @login_required(login_url='login')
 def take_exam(request, course_id):
     course = Course.objects.get(id=course_id)
+
+    if Result.objects.filter(student=request.user, exam=course).exists():
+        messages.warning(request, 'You have already taken this exam.')
+        return redirect('dashboard')
+
     questions = Question.objects.filter(course = course)
 
     if request.method == 'POST':
