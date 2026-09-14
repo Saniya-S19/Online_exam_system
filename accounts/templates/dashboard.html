@@ -80,7 +80,7 @@
             <div class="course-card">
                 <h4>{{ course.course_name }}</h4>
                 <p>Total Marks: {{ course.total_marks }}</p>
-                <a href="#">Take Exam</a>
+                <a href="{% url 'take_exam' course.id %}">Take Exam</a>
             </div>
         {% empty %}
             <p class="empty-message">No exams are currently available. Check back later!</p>

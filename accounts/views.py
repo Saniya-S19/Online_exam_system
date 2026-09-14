@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Course
+from .models import Course , Question , Result
 
 def home(request):
     return render(request, 'home.html')
@@ -59,5 +59,34 @@ def dashboard(request):
     context = {'courses': courses}
     return render(request, 'dashboard.html', context)
 
+@login_required(login_url='login')
+def take_exam(request, course_id):
+    course = Course.objects.get(id=course_id)
+    questions = Question.objects.filter(course = course)
+
+    if request.method == 'POST':
+        score = 0
+        total_questions = questions.count()
+        marks_per_question = course.total_marks / total_questions if total_questions > 0 else 0
+
+        for q in questions:
+            selected_option = request.POST.get(f'question_{q.id}')
+            if selected_option == q.correct_answer:
+                score += marks_per_question
+
+        Result.objects.create(
+            student=request.user,
+            exam=course,
+            marks_scored=int(score)
+        )
+
+        messages.success(request, f'Exam submitted! You scored {int(score)} out of {course.total_marks}.')
+        return redirect('dashboard')
 
 
+    context = {
+        'course': course,
+        'questions': questions
+
+    }
+    return render(request, 'take_exam.html', context)

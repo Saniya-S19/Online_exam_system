@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.course_name }}</title>
+</head>
+<body>
+    <h2>Exam: {{ course.course_name }}</h2>
+    <p>Total Marks: {{ course.total_marks }}</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        {% for q in questions %}
+            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+                <p>
+                    <strong>
+                        {{ forloop.counter }}. {{ q.question_text }}
+                    </strong>
+                </p>
+
+                <input type="radio" name="question_{{ q.id }}" value="Option A" required> {{ q.option1 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="Option B"> {{ q.option2 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="Option C"> {{ q.option3 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="Option D"> {{ q.option4 }}<br>
+            </div>
+        {% endfor %}
+        
+        <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px;">Submit Exam</button>
+    </form>
+</body>
+</html>
