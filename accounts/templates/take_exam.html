@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ course.course_name }}</title>
+    <title>NexaTest - {{ course.course_name }}</title>
 </head>
 <body>
     <h2>Exam: {{ course.course_name }}</h2>
@@ -18,10 +18,10 @@
                     </strong>
                 </p>
 
-                <input type="radio" name="question_{{ q.id }}" value="Option A" required> {{ q.option1 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="Option B"> {{ q.option2 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="Option C"> {{ q.option3 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="Option D"> {{ q.option4 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="{{ q.option1 }}" required> {{ q.option1 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="{{ q.option2 }}"> {{ q.option2 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="{{ q.option3 }}"> {{ q.option3 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="{{ q.option4 }}"> {{ q.option4 }}<br>
             </div>
         {% endfor %}
         

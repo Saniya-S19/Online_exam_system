@@ -53,10 +53,19 @@ def user_login(request):
 
     return render(request, 'login.html')
 
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
 @login_required(login_url='login')
 def dashboard(request):
     courses = Course.objects.all()
-    context = {'courses': courses}
+    past_results = Result.objects.filter(student=request.user).order_by('-date_taken')
+
+    context = {
+        'courses': courses,
+        'past_results': past_results
+        }
     return render(request, 'dashboard.html', context)
 
 @login_required(login_url='login')
