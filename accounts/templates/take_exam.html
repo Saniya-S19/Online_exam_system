@@ -7,7 +7,11 @@
     <h2>Exam: {{ course.course_name }}</h2>
     <p>Total Marks: {{ course.total_marks }}</p>
 
-    <form method="POST">
+    <div style="background-color: #ffe4e6; color: #e11d48; padding: 10px; border-radius: 5px; font-weight: bold; width: 150px; text-align: center; margin-bottom: 20px;">
+        Time Left: <span id="time-display">10:00</span>
+    </div>
+
+    <form method="POST" id="examForm">
         {% csrf_token %}
         
         {% for q in questions %}
@@ -27,5 +31,41 @@
         
         <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px;">Submit Exam</button>
     </form>
+
+    <script>
+        
+        let timeInMinutes = 10;
+        let timeInSeconds = timeInMinutes * 60;
+        
+        
+        const timeDisplay = document.getElementById('time-display');
+        const examForm = document.getElementById('examForm');
+
+        
+        const countdown = setInterval(function() {
+            timeInSeconds--;
+
+            
+            let minutes = Math.floor(timeInSeconds / 60);
+            let seconds = timeInSeconds % 60;
+
+            
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+
+            timeDisplay.textContent = minutes + ":" + seconds;
+
+            if (timeInSeconds <= 0) {
+                clearInterval(countdown); 
+                timeDisplay.textContent = "0:00";
+                
+                alert("Time is up! Submitting your exam automatically.");
+                
+                examForm.submit();
+            }
+        }, 1000);
+    </script>
+
 </body>
 </html>
