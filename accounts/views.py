@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Course , Question , Result
 
 def home(request):
@@ -106,3 +106,24 @@ def take_exam(request, course_id):
 
     }
     return render(request, 'take_exam.html', context)
+
+def is_teacher(user):
+    return user.is_staff
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def teacher_dashboard(request):
+    courses = Course.objects.all()
+    all_results = Result.objects.all().order_by('-date_taken')
+
+    total_students = User.objects.filter(is_staff=False).count()
+    total_exams_taken = all.results.count()
+
+    context = {
+        'courses': courses,
+        'results': all_results,
+        'total_students': total_students,
+        'total_exams_taken': total_exams_taken,
+    }
+
+    return render(request, 'teacher_dashboard.html', context)

@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/',views.user_login, name='login'),
     path('logout/',views.logout_view, name='logout'),
     path('dashboard/',views.dashboard, name='dashboard'),
+    path('teacher_dashboard/',views.teacher_dashboard, name='teacher_dashboard'),
     path('exam/<int:course_id>/',views.take_exam, name='take_exam')
 
 ]
