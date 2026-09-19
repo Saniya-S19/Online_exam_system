@@ -45,11 +45,16 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            messages.success(request, 'Login Successful!')
-            return redirect('dashboard')
 
-        messages.error(request, "Invalid username or password.")
-        return redirect('user_login')
+            if user.is_staff:
+                return redirect('teacher_dashboard')
+            else:
+                return redirect('dashboard')
+
+        else: 
+
+            messages.error(request, "Invalid username or password.")
+            return redirect('user_login')
 
     return render(request, 'login.html')
 
@@ -117,7 +122,7 @@ def teacher_dashboard(request):
     all_results = Result.objects.all().order_by('-date_taken')
 
     total_students = User.objects.filter(is_staff=False).count()
-    total_exams_taken = all.results.count()
+    total_exams_taken = all_results.count()
 
     context = {
         'courses': courses,
