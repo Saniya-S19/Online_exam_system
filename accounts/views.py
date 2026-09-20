@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Course , Question , Result
+from .forms import CourseForm, QuestionForm
 
 def home(request):
     return render(request, 'home.html')
@@ -132,3 +133,30 @@ def teacher_dashboard(request):
     }
 
     return render(request, 'teacher_dashboard.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_urls='dashboard')
+def edit_courses(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == 'POST':
+        form = CourseForm(request.POST, instance=course)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Exam "{course.course_name}" updated successfully!')
+            return redirect('teacher_dashboard')
+    else:
+        form = CourseForm(instance=course)
+    return render(request, 'add_course.html', {'form': form, 'course': course})
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def delete_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    
+    if request.method == 'POST':
+        course.delete()
+        messages.success(request, 'Exam deleted successfully!')
+        return redirect('teacher_dashboard')
+        
+    return render(request, 'delete_confirm.html', {'course': course})
+            
