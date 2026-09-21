@@ -83,5 +83,36 @@
             <p>No students have taken any exams yet.</p>
         {% endif %}
     </main>
+    <div class="section-header"><h2>Manage Exams</h2></div>
+        
+        <div class="table-container" style="margin-bottom: 3rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Exam Name</th>
+                        <th>Total Marks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                        <tr>
+                            <td><strong>{{ course.course_name }}</strong></td>
+                            <td>{{ course.total_marks }}</td>
+                            <td>
+                                <!-- Edit and Delete Buttons -->
+                                <a href="{% url 'edit_course' course.id %}" style="color: #3b82f6; text-decoration: none; font-weight: 600; margin-right: 1rem;">Edit</a>
+                                <a href="{% url 'add_question' course.id %}" style="color: #10b981; text-decoration: none; font-weight: 600; margin-right: 1rem;">+ Questions</a>
+                                <a href="{% url 'delete_course' course.id %}" style="color: #ef4444; text-decoration: none; font-weight: 600;">Delete</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #6b7280;">No exams created yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 </body>
 </html>

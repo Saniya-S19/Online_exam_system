@@ -159,4 +159,42 @@ def delete_course(request, course_id):
         return redirect('teacher_dashboard')
         
     return render(request, 'delete_confirm.html', {'course': course})
-            
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def course_questions(request, course_id):
+    # This view lists all questions for a specific exam
+    course = get_object_or_404(Course, id=course_id)
+    questions = Question.objects.filter(course=course)
+    return render(request, 'course_questions.html', {'course': course, 'questions': questions})
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def edit_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Question updated successfully!')
+            # Send them back to the list of questions
+            return redirect('course_questions', course_id=question.course.id)
+    else:
+        form = QuestionForm(instance=question)
+        
+    # We can reuse the add_question form template!
+    return render(request, 'add_question.html', {'form': form, 'course': question.course})
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def delete_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    course_id = question.course.id # Save the ID before deleting so we know where to redirect
+    
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, 'Question deleted successfully!')
+        return redirect('course_questions', course_id=course_id)
+        
+    return render(request, 'delete_question.html', {'question': question})
