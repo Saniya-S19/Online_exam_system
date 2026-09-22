@@ -135,8 +135,8 @@ def teacher_dashboard(request):
     return render(request, 'teacher_dashboard.html', context)
 
 @login_required(login_url='login')
-@user_passes_test(is_teacher, login_urls='dashboard')
-def edit_courses(request, course_id):
+@user_passes_test(is_teacher, login_url='dashboard')
+def edit_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     if request.method == 'POST':
         form = CourseForm(request.POST, instance=course)
@@ -198,3 +198,37 @@ def delete_question(request, question_id):
         return redirect('course_questions', course_id=course_id)
         
     return render(request, 'delete_question.html', {'question': question})
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def add_course(request):
+    if request.method == 'POST':
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            course = form.save()
+            messages.success(request, f'Exam "{course.course_name}" created! Now add some questions.')
+            return redirect('add_question', course_id=course.id)
+    else:
+        form = CourseForm()
+        
+    return render(request, 'add_course.html', {'form': form})
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def add_question(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.course = course
+            question.save()
+            
+            messages.success(request, 'Question added successfully!')
+            return redirect('add_question', course_id=course.id)
+    else:
+        form = QuestionForm()
+        
+    context = {'form': form, 'course': course}
+    return render(request, 'add_question.html', context)

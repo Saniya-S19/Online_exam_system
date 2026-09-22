@@ -100,7 +100,7 @@
                             <td><strong>{{ course.course_name }}</strong></td>
                             <td>{{ course.total_marks }}</td>
                             <td>
-                                <!-- Edit and Delete Buttons -->
+                                <a href="{% url 'course_questions' course.id %}" style="color: #8b5cf6; text-decoration: none; font-weight: 600; margin-right: 1rem;">View Questions</a>
                                 <a href="{% url 'edit_course' course.id %}" style="color: #3b82f6; text-decoration: none; font-weight: 600; margin-right: 1rem;">Edit</a>
                                 <a href="{% url 'add_question' course.id %}" style="color: #10b981; text-decoration: none; font-weight: 600; margin-right: 1rem;">+ Questions</a>
                                 <a href="{% url 'delete_course' course.id %}" style="color: #ef4444; text-decoration: none; font-weight: 600;">Delete</a>
