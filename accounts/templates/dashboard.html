@@ -1,141 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexaTest - Student Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
+    <title>NexaTest - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f3f4f6; color: #1f2937; line-height: 1.5; }
-
-        .navbar { background: #ffffff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .navbar h1 { font-size: 1.5rem; color: #111827; font-weight: 700; }
-        .navbar .user-info { display: flex; align-items: center; gap: 1rem; }
-        .btn-logout { background: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; transition: background 0.2s; }
-        .btn-logout:hover { background: #dc2626; }
-
-        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
-        .section-header { margin-bottom: 1.5rem; }
-        .section-header h2 { font-size: 1.25rem; font-weight: 600; color: #374151; }
-
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-        .card { background: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .card h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: #111827; }
-        .card p { color: #6b7280; font-size: 0.875rem; margin-bottom: 1.5rem; }
-        .btn-primary { display: block; background: #3b82f6; color: white; padding: 0.6rem 1rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600; text-align: center; transition: background 0.2s; }
-        .btn-primary:hover { background: #2563eb; }
-
-        .table-container { background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e5e7eb; }
-        table { width: 100%; border-collapse: collapse; }
-        thead { background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
-        th { text-align: left; padding: 0.75rem 1.5rem; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
-        td { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; font-size: 0.875rem; color: #111827; }
-        tr:last-child td { border-bottom: none; }
-
-        .score-badge { background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; font-size: 0.85rem; }
-
-        .alert {
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .alert-success {
-            background-color: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-        .alert-warning {
-            background-color: #fef08a;
-            color: #854d0e;
-            border: 1px solid #fde047;
-        }
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
         
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #ffffff; 
+            min-height: 100vh;
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+        }
+
+        .app-window {
+            width: 100%;
+            max-width: 100%; 
+            height: 100vh; 
+            background: #ffffff;
+            border-radius: 0; 
+            box-shadow: none; 
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 3. The Deep Indigo Left Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #5c59ad;
+            color: white;
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+            letter-spacing: -0.5px;
+        }
+        .nav-item {
+            padding: 1rem 2rem;
+            color: #d1d0e8;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2.5rem 3rem;
+            background: #ffffff;
+            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #433c82;
+            margin: 0;
+            font-size: 1.75rem;
+        }
+
+        /* 5. The Floating Exam Cards */
+        .exam-card {
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+        .exam-card:hover { transform: translateY(-3px); }
+        
+        /* Alternating Colors just like the reference image */
+        .card-white { background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .card-purple { background: #f6edfd; }
+        .card-pink { background: #fcecf0; }
+        
+        .exam-info h3 { color: #1e1b4b; margin: 0 0 0.5rem 0; font-size: 1.25rem; }
+        .exam-info p { color: #6b7280; font-size: 0.875rem; margin: 0; }
+        
+        .btn-arrow {
+            background: #a78bfa;
+            color: white;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(167, 139, 250, 0.4);
+            transition: background 0.2s;
+        }
+        .btn-arrow:hover { background: #8b5cf6; }
+
+        /* 6. The Right Sidebar (Calendar/Profile area) */
+        .right-sidebar {
+            width: 300px;
+            padding: 2.5rem;
+            background: #ffffff;
+            border-left: 1px solid #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .profile-img {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            margin-bottom: 1rem;
+        }
+        .profile-name { color: #1e1b4b; font-weight: 600; margin: 0; }
+        .profile-id { color: #9ca3af; font-size: 0.8rem; margin-top: 0.25rem; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <h1 style="color: #3b82f6;">NexaTest</h1>
-        <div class="user-info">
-            <span>Welcome, <strong>{{ user.username }}</strong></span>
-            <a href="{% url 'logout' %}" class="btn-logout">Logout</a>
+    <div class="app-window">
+        
+        <!-- LEFT SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">NexaTest</div>
+            <a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a>
+            <a href="#" class="nav-item">All Exams</a>
+            <a href="#" class="nav-item">Results</a>
+            <div style="flex: 1;"></div> <!-- Pushes settings to the bottom -->
+            <a href="#" class="nav-item">Settings</a>
+            <a href="{% url 'logout' %}" class="nav-item">Logout</a>
         </div>
-    </nav>
 
-    {% if messages %}
-        <div style="max-width: 1000px; margin: 1rem auto 0; padding: 0 1.5rem;">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
+        <!-- MAIN CONTENT (EXAM CARDS) -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Available Exams</h1>
+            </div>
+
+            {% if messages %}
+                <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
+                    {% for message in messages %}{{ message }}{% endfor %}
                 </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+            {% endif %}
 
-    <main class="container">
-        
-
-        <div class="section-header">
-            <h2>Available Exams</h2>
-        </div>
-        
-        <div class="grid">
             {% for course in courses %}
-                <div class="card">
-                    <h3>{{ course.course_name }}</h3>
-                    <p>Total Marks: {{ course.total_marks }}</p>
-                    {% if course.id in taken_exam_ids %}
-                        <span class="btn-primary" style="background-color: #9ca3af; cursor: not-allowed;">Completed</span>
-                    {% else %}
-                        <a href="{% url 'take_exam' course.id %}" class="btn-primary">Take Exam</a>
-                    {% endif %}
+                <div class="exam-card 
+                    {% if forloop.counter|divisibleby:3 %}card-pink
+                    {% elif forloop.counter|divisibleby:2 %}card-purple
+                    {% else %}card-white{% endif %}">
+                    
+                    <div class="exam-info">
+                        <h3>{{ course.course_name }}</h3>
+                        <p>Total Marks: {{ course.total_marks }} &nbsp;&bull;&nbsp; Online Assessment</p>
+                    </div>
+                    
+                    <a href="#" class="btn-arrow">&rarr;</a>
                 </div>
             {% empty %}
-                <p style="color: #6b7280; grid-column: 1 / -1;">No exams available right now. Check back later!</p>
+                <p style="color: #9ca3af;">No exams available right now.</p>
             {% endfor %}
         </div>
 
-
-        <div class="section-header">
-            <h2>Your Past Results</h2>
+        <div class="right-sidebar">
+            <div class="profile-img"></div>
+            <p class="profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p class="profile-id">Student ID: {{ request.user.id }}</p>
+            
+            <div style="margin-top: 3rem; width: 100%;">
+                <h4 style="color: #433c82; margin-bottom: 1rem;">Your Stats</h4>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Completed Exams</span>
+                    <strong style="color: #1e1b4b;">3</strong>
+                </div>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Average Score</span>
+                    <strong style="color: #1e1b4b;">85%</strong>
+                </div>
+            </div>
         </div>
 
-        {% if past_results %}
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Exam Name</th>
-                            <th>Score</th>
-                            <th>Date Taken</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for result in past_results %}
-                            <tr>
-                                <td><strong>{{ result.exam.course_name }}</strong></td>
-                                <td><span class="score-badge">{{ result.marks_scored }}</span></td>
-                                <td>{{ result.date_taken|date:"M d, Y g:i A" }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p style="color: #6b7280;">You haven't taken any exams yet.</p>
-        {% endif %}
+    </div>
 
-    </main>
 </body>
 </html>

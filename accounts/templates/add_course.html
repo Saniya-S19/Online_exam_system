@@ -15,7 +15,6 @@
 </head>
 <body>
     <div class="form-container">
-        <!-- This dynamically changes the title based on if you are editing or creating! -->
         <h2>{% if course %}Edit Exam: {{ course.course_name }}{% else %}Create New Exam{% endif %}</h2>
         
         <form method="POST">
