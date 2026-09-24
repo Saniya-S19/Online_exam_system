@@ -167,7 +167,7 @@
                         <p>Total Marks: {{ course.total_marks }} &nbsp;&bull;&nbsp; Online Assessment</p>
                     </div>
                     
-                    <a href="#" class="btn-arrow">&rarr;</a>
+                    <a href="{% url 'take_exam' course.id %}" class="btn-arrow">&rarr;</a>
                 </div>
             {% empty %}
                 <p style="color: #9ca3af;">No exams available right now.</p>

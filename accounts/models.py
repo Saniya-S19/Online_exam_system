@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 class Course(models.Model):
     course_name = models.CharField(max_length=100)
     total_marks = models.IntegerField()
+    time_limit = models.IntegerField(default=30, help_text="Duration in minutes")
 
     def __str__(self):
         return self.course_name
