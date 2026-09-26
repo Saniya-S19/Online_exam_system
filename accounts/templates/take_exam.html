@@ -5,14 +5,11 @@
 </head>
 <body>
     <div style="background: #fee2e2; color: #b91c1c; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 700; display: inline-block; margin-bottom: 1.5rem;">
-    ⏱️ Time Remaining: <span id="timer-display">Loading...</span>
+    ⏱️ Time Remaining: <span id="time-display">Loading...</span>
     </div>
     <h2>Exam: {{ course.course_name }}</h2>
     <p>Total Marks: {{ course.total_marks }}</p>
 
-    <div style="background-color: #ffe4e6; color: #e11d48; padding: 10px; border-radius: 5px; font-weight: bold; width: 150px; text-align: center; margin-bottom: 20px;">
-        Time Left: <span id="time-display">10:00</span>
-    </div>
 
     <form method="POST" id="examForm">
         {% csrf_token %}
@@ -60,7 +57,6 @@
             timeDisplay.textContent = "0:00";
             alert("Time is up! Submitting your exam automatically.");
             
-            // Make sure the form exists before trying to submit
             if(examForm) {
                 examForm.submit();
             }
