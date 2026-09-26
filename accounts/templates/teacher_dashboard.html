@@ -218,7 +218,16 @@
 
             <!-- STUDENT RESULTS TABLE -->
             <div class="table-container">
-                <h2>Recent Student Results</h2>
+                
+                <!-- Header with Title and Download Button -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0;">Recent Student Results</h2>
+                    <a href="{% url 'export_results_csv' %}" class="btn-add" style="background: #5c59ad; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);">
+                        Download CSV
+                    </a>
+                </div>
+
+                <!-- The Results Table -->
                 <table>
                     <thead>
                         <tr>
@@ -228,12 +237,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Assuming you have a 'results' variable passed from views.py -->
                         {% for result in results %}
                             <tr>
                                 <td>{{ result.student.username }}</td>
                                 <td>{{ result.exam.course_name }}</td>
-                                <td><strong>{{ result.marks_scored }}</strong></td>
+                                <td><strong>{{ result.marks_scored }}</strong></td> 
                             </tr>
                         {% empty %}
                             <tr>
@@ -242,6 +250,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                
             </div>
 
         </div>

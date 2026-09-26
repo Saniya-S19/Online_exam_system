@@ -1,3 +1,5 @@
+import csv
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -232,3 +234,19 @@ def add_question(request, course_id):
         
     context = {'form': form, 'course': course}
     return render(request, 'add_question.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(is_teacher, login_url='dashboard')
+def export_results_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="student_results.csv"'
+
+    writer = csv.writer(response)
+    
+    writer.writerow(['Student Name', 'Exam Name', 'Score'])
+
+    results = Result.objects.all() 
+    for result in results:
+        writer.writerow([result.student.username, result.exam.course_name, result.marks_scored]) 
+
+    return response
