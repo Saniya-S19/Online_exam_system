@@ -86,32 +86,50 @@ def take_exam(request, course_id):
         messages.warning(request, 'You have already taken this exam.')
         return redirect('dashboard')
 
-    questions = Question.objects.filter(course = course)
+    questions = Question.objects.filter(course=course)
 
     if request.method == 'POST':
         score = 0
         total_questions = questions.count()
         marks_per_question = course.total_marks / total_questions if total_questions > 0 else 0
+        
+        # 1. Create a list to track right and wrong answers
+        review_data = []
 
         for q in questions:
             selected_option = request.POST.get(f'question_{q.id}')
-            if selected_option == q.correct_answer:
+            is_correct = (selected_option == q.correct_answer)
+            
+            if is_correct:
                 score += marks_per_question
+                
+            # 2. Store the data for the review page
+            review_data.append({
+                'question_obj': q,
+                'selected_option': selected_option,
+                'is_correct': is_correct
+            })
 
+        # 3. Save the result
         Result.objects.create(
             student=request.user,
             exam=course,
             marks_scored=int(score)
         )
 
-        messages.success(request, f'Exam submitted! You scored {int(score)} out of {course.total_marks}.')
-        return redirect('dashboard')
+        # 4. Render the review page instead of redirecting to the dashboard
+        context = {
+            'course': course,
+            'score': int(score),
+            'total_marks': course.total_marks,
+            'review_data': review_data
+        }
+        return render(request, 'exam_review.html', context)
 
-
+    # Normal GET request loads the exam
     context = {
         'course': course,
         'questions': questions
-
     }
     return render(request, 'take_exam.html', context)
 

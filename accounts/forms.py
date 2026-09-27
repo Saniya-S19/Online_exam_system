@@ -4,10 +4,11 @@ from .models import Course, Question
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['course_name', 'total_marks']
+        fields = ['course_name', 'total_marks', 'time_limit']
         widgets = {
             'course_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Python Basics'}),
             'total_marks': forms.NumberInput(attrs={'class': 'form-control'}),
+            'time_limit': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
 class QuestionForm(forms.ModelForm):
