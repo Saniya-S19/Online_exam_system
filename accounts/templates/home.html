@@ -1,83 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexaTest - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            text-align: center;
+            font-family: 'Inter', sans-serif;
+            background-color: #061e47; /* Your exact Navy Blue */
+            color: #ffffff; 
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4rem;
+            background-color: #061e47; /* Matches Navy background */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff; 
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        /* Orange Logo Accent */
+        .brand-logo span { color: #F26722; } 
+
+        /* Top Right Nav Links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
         
-        .hero-container {
-            background-color: #ffffff;
-            padding: 50px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-        }
 
-        h1 {
-            color: #333333;
-            margin-top: 0;
-        }
-
-        p {
-            color: #666666;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 5px;
+        .nav-signup {
+            color: #F26722; 
             text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 2px solid #F26722; 
+            padding: 0.4rem 1.2rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
         }
 
-        .btn-primary {
-            background-color: #007bff;
+        .nav-signup:hover {
+            background: #F26722; 
             color: white;
         }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
+        /* Main Split Container - Full Bleed */
+        .container {
+            display: flex;
+            flex: 1; 
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
 
-        .btn-secondary {
-            background-color: #e2e6ea;
-            color: #333333;
+        /* Shared Column Styles */
+        .column {
+            flex: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; 
+            text-align: center;
         }
 
-        .btn-secondary:hover {
-            background-color: #dae0e5;
+        .border-right { 
+            border-right: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        /* Headings */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin: 0 0 1.5rem 0;
+            color: #ffffff; 
+        }
+        
+        h1 em {
+            font-style: italic;
+            font-weight: 700;
+            color: #F26722; 
+        }
+
+        /* Descriptions */
+        .description {
+            color: rgba(255, 255, 255, 0.85); 
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            max-width: 400px;
+        }
+
+        /* Main Login Buttons */
+        .btn-main {
+            background: #ffffff; 
+            color: #061e47; /* Matches your Navy */
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.8rem 3rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            margin-bottom: 4rem;
+        }
+
+        .btn-main:hover { 
+            background: #F26722; 
+            color: #ffffff; 
+        }
+
+        /* Footer / Signup Text */
+        .account-text {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .account-link {
+            color: #F26722; 
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .account-link:hover { text-decoration: underline; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .border-right { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .navbar { padding: 1rem 2rem; }
+            .column { padding: 4rem 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="hero-container">
-        <h1 style="color: #007bff;">NexaTest</h1>
-        <p>Test your knowledge, track your progress, and achieve your goals with our secure online assessment platform.</p>
-        
-        <div class="btn-group">
-            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-            <a href="{% url 'signup' %}" class="btn btn-secondary">Create Account</a>
+    <nav class="navbar">
+        <a href="#" class="brand-logo">Nexa<span>Test</span></a>
+        <div class="nav-links">
+            <a href="{% url 'signup' %}" class="nav-signup">Get Started</a>
         </div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="column border-right">
+            <h1>For <em>Teachers</em></h1>
+            <p class="description">
+                Create engaging exams, set time limits, and automatically track student performance across all your courses.
+            </p>
+            
+            <a href="{% url 'login' %}" class="btn-main">Login</a>
+            
+            <p class="account-text">Don't have an account?</p>
+            <p class="account-text">
+                <a href="#" class="account-link">Contact admin</a> or <a href="#" class="account-link">Request access</a>
+            </p>
+        </div>
+
+        <div class="column">
+            <h1>For <em>Students</em></h1>
+            <p class="description">
+                Join your classes, practice your skills with timed assessments, and review your performance instantly.
+            </p>
+            
+            <a href="{% url 'login' %}" class="btn-main">Login</a>
+            
+            <p class="account-text">Don't have an account?</p>
+            <p class="account-text"><a href="{% url 'signup' %}" class="account-link">Sign up.</a></p>
+        </div>
+
     </div>
 
 </body>
