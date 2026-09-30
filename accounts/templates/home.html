@@ -144,6 +144,14 @@
 
         .account-link:hover { text-decoration: underline; }
 
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.4); /* Faded white so it isn't distracting */
+            font-size: 0.85rem;
+            margin-top: auto; /* Pushes it to the very bottom */
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
@@ -156,7 +164,7 @@
 <body>
 
     <nav class="navbar">
-        <a href="#" class="brand-logo">Nexa<span>Test</span></a>
+        <a href="/" class="brand-logo">Nexa<span>Test</span></a>
         <div class="nav-links">
             <a href="{% url 'signup' %}" class="nav-signup">Get Started</a>
         </div>
@@ -191,6 +199,10 @@
         </div>
 
     </div>
+
+    <footer class="footer">
+        &copy; 2026 NexaTest. All rights reserved.
+    </footer>
 
 </body>
 </html>
