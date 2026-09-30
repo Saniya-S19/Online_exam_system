@@ -9,6 +9,8 @@ from .models import Course , Question , Result
 from .forms import CourseForm, QuestionForm
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, 'home.html')
 
 def signup(request):
