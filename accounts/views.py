@@ -69,15 +69,20 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def dashboard(request):
-    courses = Course.objects.all()
+    # 1. Securely fetch ONLY the courses this student is enrolled in
+    my_courses = request.user.enrolled_courses.all()
+    
+    # 3. Fetch past results
     past_results = Result.objects.filter(student=request.user).order_by('-date_taken')
     taken_exam_ids = past_results.values_list('exam_id', flat=True)
 
     context = {
-        'courses': courses,
+        # THE FIX: Pass my_courses to the template, never Course.objects.all()
+        'courses': my_courses, 
         'past_results': past_results,
-        'taken_exam_ids': taken_exam_ids
-        }
+        'taken_exam_ids': taken_exam_ids,
+    }
+    
     return render(request, 'dashboard.html', context)
 
 @login_required(login_url='login')

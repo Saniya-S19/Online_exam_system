@@ -5,6 +5,8 @@ class Course(models.Model):
     course_name = models.CharField(max_length=100)
     total_marks = models.IntegerField()
     time_limit = models.IntegerField(default=30, help_text="Duration in minutes")
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='taught_courses')
+    enrolled_students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
 
     def __str__(self):
         return self.course_name
