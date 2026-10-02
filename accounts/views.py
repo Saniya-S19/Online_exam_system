@@ -77,7 +77,6 @@ def dashboard(request):
     taken_exam_ids = past_results.values_list('exam_id', flat=True)
 
     context = {
-        # THE FIX: Pass my_courses to the template, never Course.objects.all()
         'courses': my_courses, 
         'past_results': past_results,
         'taken_exam_ids': taken_exam_ids,
@@ -275,3 +274,38 @@ def export_results_csv(request):
         writer.writerow([result.student.username, result.exam.course_name, result.marks_scored]) 
 
     return response
+
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.models import User
+
+def manage_students(request, course_id):
+    # 1. Fetch the specific course
+    course = get_object_or_404(Course, id=course_id)
+    
+    # 2. Security Check: Prevent other teachers from editing this roster
+    if course.teacher != request.user:
+        return redirect('teacher_dashboard')
+
+    # 3. Handle the form submission when the teacher clicks "Save"
+    if request.method == 'POST':
+        # Get the list of selected student IDs from the HTML form checkboxes
+        student_ids = request.POST.getlist('students') 
+        
+        # Django's .set() magic updates the ManyToMany database field instantly
+        course.enrolled_students.set(student_ids)
+        
+        return redirect('teacher_dashboard')
+
+    # 4. If loading the page normally, get all students to display in the list
+    # (Filtering out superusers/admins so teachers only see actual students)
+    all_students = User.objects.filter(is_superuser=False)
+    
+    context = {
+        'course': course,
+        'all_students': all_students,
+        # We pass this so the HTML template knows which checkboxes to pre-check
+        'enrolled_ids': course.enrolled_students.values_list('id', flat=True) 
+    }
+    
+    return render(request, 'manage_students.html', context)
