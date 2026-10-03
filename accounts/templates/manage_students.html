@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students - {{ course.course_name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #061e47; /* Navy Background */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05); /* Frosted card effect */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #ffffff;
+            font-weight: 400;
+        }
+
+        h2 em {
+            color: #F26722; /* Orange highlight */
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        .student-list {
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto; /* Adds a scrollbar if you have many students */
+        }
+
+        .student-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+        }
+
+        /* Custom Checkbox Sizing */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #F26722; /* Makes the checkbox tick orange */
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #F26722;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cancel {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            margin-left: 1rem;
+            font-weight: 600;
+        }
+        
+        .btn-cancel:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Manage <em>{{ course.course_name }}</em></h2>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="student-list">
+                {% for student in all_students %}
+                    <label class="student-item">
+                        <!-- Django checks if the student is in the course's enrolled_students list -->
+                        <input type="checkbox" name="students" value="{{ student.id }}" 
+                            {% if student in course.enrolled_students.all %}checked{% endif %}>
+                        {{ student.username }} 
+                    </label>
+                {% empty %}
+                    <p style="color: rgba(255,255,255,0.5);">No students registered on the platform yet.</p>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="btn-save">Save Roster</button>
+            <a href="{% url 'teacher_dashboard' %}" class="btn-cancel">Cancel</a>
+        </form>
+    </div>
+
+</body>
+</html>
