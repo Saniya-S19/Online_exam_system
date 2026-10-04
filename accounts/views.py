@@ -350,3 +350,15 @@ def add_question(request, course_id):
         return redirect('course_questions', course_id=course.id)
     
     return render(request, 'add_question.html', {'course': course})
+
+
+def course_questions(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if course.teacher != request.user:
+        return redirect('teacher_dashboard')
+    questions = Question.objects.filter(course=course)
+
+    return render(request, 'course_questions.html', {
+        'course': course,
+        'questions': questions
+    })
