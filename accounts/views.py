@@ -115,7 +115,7 @@ def take_exam(request, course_id):
             exam=course,
             marks_scored=int(score)
         )
-        
+
         context = {
             'course': course,
             'score': int(score),
@@ -223,7 +223,10 @@ def add_course(request):
     if request.method == 'POST':
         form = CourseForm(request.POST)
         if form.is_valid():
-            course = form.save()
+            course = form.save(commit=False)
+            course.teacher = request.user
+            course.save()
+            
             messages.success(request, f'Exam "{course.course_name}" created! Now add some questions.')
             return redirect('add_question', course_id=course.id)
     else:
@@ -239,18 +242,19 @@ def add_question(request, course_id):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
+            # commit=False pauses the save so we can attach the course
             question = form.save(commit=False)
             question.course = course
             question.save()
             
             messages.success(request, 'Question added successfully!')
-            return redirect('add_question', course_id=course.id)
+            return redirect('course_questions', course_id=course.id) 
+            # (Note: I changed the redirect above to 'course_questions' so it takes you to the list instead of reloading the add page)
     else:
         form = QuestionForm()
         
     context = {'form': form, 'course': course}
     return render(request, 'add_question.html', context)
-
 @login_required(login_url='login')
 @user_passes_test(is_teacher, login_url='dashboard')
 def export_results_csv(request):
@@ -299,45 +303,7 @@ def manage_students(request, course_id):
     
     return render(request, 'manage_students.html', context)
 
-def add_question(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    if course.teacher != request.user:
-        return redirect('teacher_dashboard')
 
-    if request.method == 'POST':
-        question_text = request.POST.get('question_text')
-        option1 = request.POST.get('option1')
-        option2 = request.POST.get('option2')
-        option3 = request.POST.get('option3')
-        option4 = request.POST.get('option4')
-        
-        # We need to map the selected '1, 2, 3, 4' to the actual option text
-        correct_option_number = request.POST.get('correct_option')
-        answer = ""
-        if correct_option_number == "1": answer = option1
-        elif correct_option_number == "2": answer = option2
-        elif correct_option_number == "3": answer = option3
-        elif correct_option_number == "4": answer = option4
-
-        marks = request.POST.get('marks')
-
-        # Create and save the new question to the database
-        # (Double check that these field names match your models.py!)
-        Question.objects.create(
-            course=course,
-            question=question_text,
-            option1=option1,
-            option2=option2,
-            option3=option3,
-            option4=option4,
-            answer=answer,
-            marks=marks
-        )
-        
-        # After saving, send the teacher back to the question list
-        return redirect('course_questions', course_id=course.id)
-    
-    return render(request, 'add_question.html', {'course': course})
 
 
 def course_questions(request, course_id):
@@ -351,4 +317,6 @@ def course_questions(request, course_id):
         'questions': questions
     })
 
+def export_results_csv(request, course_id=None):
+    return HttpResponse("CSV Export feature coming tomorrow!")
 

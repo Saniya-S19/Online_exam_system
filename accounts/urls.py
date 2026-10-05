@@ -18,6 +18,7 @@ urlpatterns = [
     path('add-question/<int:course_id>/', views.add_question, name='add_question'),
     #path('results/',views.results, name='results'),
     path('manage-students/<int:course_id>/', views.manage_students, name='manage_students'),
+    path('export-results-csv/', views.export_results_csv, name='export_results_csv'),
     
 
 ]

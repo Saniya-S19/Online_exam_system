@@ -97,50 +97,11 @@
         <form method="POST">
             {% csrf_token %}
             
-            <div class="form-group">
-                <label>Question Text</label>
-                <textarea name="question_text" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Option 1</label>
-                <input type="text" name="option1" required>
-            </div>
-
-            <div class="form-group">
-                <label>Option 2</label>
-                <input type="text" name="option2" required>
-            </div>
-
-            <div class="form-group">
-                <label>Option 3</label>
-                <input type="text" name="option3" required>
-            </div>
-
-            <div class="form-group">
-                <label>Option 4</label>
-                <input type="text" name="option4" required>
-            </div>
-
-            <div class="form-group">
-                <label>Correct Answer</label>
-                <select name="correct_option" required>
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                    <option value="3">Option 3</option>
-                    <option value="4">Option 4</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Marks for this Question</label>
-                <input type="text" name="marks" value="1" required>
-            </div>
+            {{ form.as_p }}
             
             <button type="submit" class="btn-submit">Save Question</button>
             <a href="{% url 'course_questions' course.id %}" class="btn-cancel">Cancel</a>
         </form>
-    </div>
 
 </body>
 </html>
