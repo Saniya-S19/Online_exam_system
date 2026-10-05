@@ -1,7 +1,7 @@
 import csv
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, views
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -69,10 +69,7 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def dashboard(request):
-    # 1. Securely fetch ONLY the courses this student is enrolled in
     my_courses = request.user.enrolled_courses.all()
-    
-    # 3. Fetch past results
     past_results = Result.objects.filter(student=request.user).order_by('-date_taken')
     taken_exam_ids = past_results.values_list('exam_id', flat=True)
 
@@ -98,8 +95,6 @@ def take_exam(request, course_id):
         score = 0
         total_questions = questions.count()
         marks_per_question = course.total_marks / total_questions if total_questions > 0 else 0
-        
-        # 1. Create a list to track right and wrong answers
         review_data = []
 
         for q in questions:
@@ -109,21 +104,18 @@ def take_exam(request, course_id):
             if is_correct:
                 score += marks_per_question
                 
-            # 2. Store the data for the review page
             review_data.append({
                 'question_obj': q,
                 'selected_option': selected_option,
                 'is_correct': is_correct
             })
 
-        # 3. Save the result
         Result.objects.create(
             student=request.user,
             exam=course,
             marks_scored=int(score)
         )
-
-        # 4. Render the review page instead of redirecting to the dashboard
+        
         context = {
             'course': course,
             'score': int(score),
@@ -276,9 +268,6 @@ def export_results_csv(request):
     return response
 
 
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.models import User
-
 def manage_students(request, course_id):
     # 1. Fetch the specific course
     course = get_object_or_404(Course, id=course_id)
@@ -316,7 +305,6 @@ def add_question(request, course_id):
         return redirect('teacher_dashboard')
 
     if request.method == 'POST':
-        # Extract the data sent from our frontend form
         question_text = request.POST.get('question_text')
         option1 = request.POST.get('option1')
         option2 = request.POST.get('option2')
@@ -362,3 +350,5 @@ def course_questions(request, course_id):
         'course': course,
         'questions': questions
     })
+
+

@@ -16,7 +16,8 @@ urlpatterns = [
     path('delete-question/<int:question_id>/', views.delete_question, name='delete_question'),
     path('add-course/', views.add_course, name='add_course'),
     path('add-question/<int:course_id>/', views.add_question, name='add_question'),
-    path('results/',views.results, name='results'),
+    #path('results/',views.results, name='results'),
+    path('manage-students/<int:course_id>/', views.manage_students, name='manage_students'),
     
 
 ]
