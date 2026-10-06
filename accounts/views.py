@@ -1,12 +1,15 @@
 import csv
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout, views
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Course , Question , Result
 from .forms import CourseForm, QuestionForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 def home(request):
     if request.user.is_authenticated:
@@ -15,26 +18,26 @@ def home(request):
 
 def signup(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
 
-        if password != confirm_password:
-            messages.error(request, 'Passwords do not match!')
+        try:
+            # Create the user securely
+            user = User.objects.create_user(username=username, email=email, password=password)
+            
+            # Everyone who uses this form is strictly a student
+            user.is_teacher = False
+            user.is_student = True
+            user.save()
+            
+            messages.success(request, 'Student account created! Please log in.')
+            return redirect('login')
+            
+        except Exception as e:
+            messages.error(request, 'That username is already taken. Please try another one.')
             return redirect('signup')
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists!')
-            return redirect('signup')
-
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already exists!')
-            return redirect('signup')
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        messages.success(request, 'Account created successfully!')
-        return redirect('login')
     return render(request, 'signup.html')
 
 def user_login(request):
@@ -255,6 +258,7 @@ def add_question(request, course_id):
         
     context = {'form': form, 'course': course}
     return render(request, 'add_question.html', context)
+
 @login_required(login_url='login')
 @user_passes_test(is_teacher, login_url='dashboard')
 def export_results_csv(request):
@@ -272,36 +276,36 @@ def export_results_csv(request):
     return response
 
 
-def manage_students(request, course_id):
-    # 1. Fetch the specific course
-    course = get_object_or_404(Course, id=course_id)
+# def manage_students(request, course_id):
+#     # 1. Fetch the specific course
+#     course = get_object_or_404(Course, id=course_id)
     
-    # 2. Security Check: Prevent other teachers from editing this roster
-    if course.teacher != request.user:
-        return redirect('teacher_dashboard')
+#     # 2. Security Check: Prevent other teachers from editing this roster
+#     if course.teacher != request.user:
+#         return redirect('teacher_dashboard')
 
-    # 3. Handle the form submission when the teacher clicks "Save"
-    if request.method == 'POST':
-        # Get the list of selected student IDs from the HTML form checkboxes
-        student_ids = request.POST.getlist('students') 
+#     # 3. Handle the form submission when the teacher clicks "Save"
+#     if request.method == 'POST':
+#         # Get the list of selected student IDs from the HTML form checkboxes
+#         student_ids = request.POST.getlist('students') 
         
-        # Django's .set() magic updates the ManyToMany database field instantly
-        course.enrolled_students.set(student_ids)
+#         # Django's .set() magic updates the ManyToMany database field instantly
+#         course.enrolled_students.set(student_ids)
         
-        return redirect('teacher_dashboard')
+#         return redirect('teacher_dashboard')
 
-    # 4. If loading the page normally, get all students to display in the list
-    # (Filtering out superusers/admins so teachers only see actual students)
-    all_students = User.objects.filter(is_superuser=False)
+#     # 4. If loading the page normally, get all students to display in the list
+#     # (Filtering out superusers/admins so teachers only see actual students)
+#     all_students = User.objects.filter(is_superuser=False)
     
-    context = {
-        'course': course,
-        'all_students': all_students,
-        # We pass this so the HTML template knows which checkboxes to pre-check
-        'enrolled_ids': course.enrolled_students.values_list('id', flat=True) 
-    }
+#     context = {
+#         'course': course,
+#         'all_students': all_students,
+#         # We pass this so the HTML template knows which checkboxes to pre-check
+#         'enrolled_ids': course.enrolled_students.values_list('id', flat=True) 
+#     }
     
-    return render(request, 'manage_students.html', context)
+#     return render(request, 'manage_students.html', context)
 
 
 
@@ -318,5 +322,30 @@ def course_questions(request, course_id):
     })
 
 def export_results_csv(request, course_id=None):
+
     return HttpResponse("CSV Export feature coming tomorrow!")
 
+
+def manage_students(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    
+    # Security check: only the teacher can manage their course
+    if course.teacher != request.user:
+        return redirect('teacher_dashboard')
+        
+    # Fetch all students (You might need to adjust this filter if you have a specific 'is_student' flag)
+    students = User.objects.exclude(is_superuser=True).exclude(id=request.user.id)
+    
+    if request.method == 'POST':
+        # Get the list of IDs for every checkbox the teacher clicked
+        selected_student_ids = request.POST.getlist('students')
+        
+        # Django's .set() magic automatically updates the Many-to-Many database table!
+        course.enrolled_students.set(selected_student_ids)
+        
+        return redirect('teacher_dashboard')
+        
+    return render(request, 'manage_students.html', {
+        'course': course,
+        'students': students
+    })
