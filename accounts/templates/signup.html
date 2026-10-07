@@ -3,66 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration - NexaTest</title>
+    <title>Sign Up - NexaTest</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
             display: flex;
-            height: 100vh;
-            background-color: #f4f7f6;
-        }
-
-        /* LEFT SIDE - BRANDING */
-        .brand-panel {
-            flex: 1;
-            background-color: #061e47;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 4rem;
-        }
-        
-        .brand-panel h1 { font-size: 3rem; margin-bottom: 1rem; }
-        .brand-panel h1 em { color: #F26722; font-style: normal; }
-        .brand-panel p { color: rgba(255,255,255,0.7); font-size: 1.2rem; line-height: 1.6; }
-
-        /* RIGHT SIDE - FORM */
-        .form-panel {
-            flex: 1;
-            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            min-height: 100vh;
+            background-color: #061e47; /* Solid Navy Background */
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
         }
 
-        .signup-card {
-            background: white;
+        /* Decorative background elements */
+        .bg-circle-1 {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(242, 103, 34, 0.15);
+            border-radius: 50%;
+            top: -50px;
+            left: -100px;
+            filter: blur(60px);
+        }
+        .bg-circle-2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            bottom: -50px;
+            right: -50px;
+            filter: blur(40px);
+        }
+
+        /* THE FROSTED GLASS CARD */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 3rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(6, 30, 71, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 450px;
+            max-width: 400px;
+            z-index: 10;
         }
 
-        .signup-card h2 { color: #061e47; margin-top: 0; margin-bottom: 2rem; font-size: 1.8rem; text-align: center}
+        .glass-card h2 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .glass-card h2 em {
+            color: #F26722;
+            font-style: normal;
+        }
+
+        .glass-card p {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
 
         /* FORM ELEMENTS */
         .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; color: #061e47; font-weight: 500; font-size: 0.9rem;}
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            color: rgba(255, 255, 255, 0.9); 
+            font-weight: 500; 
+            font-size: 0.9rem;
+        }
+        
         .form-group input {
             width: 100%;
             padding: 0.8rem;
-            border: 1px solid #cbd5e1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
             border-radius: 6px;
             font-family: 'Inter', sans-serif;
             box-sizing: border-box;
-            transition: border-color 0.2s;
+            transition: all 0.3s;
         }
-        .form-group input:focus { outline: none; border-color: #F26722; }
         
+        .form-group input:focus { 
+            outline: none; 
+            border-color: #F26722; 
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        /* PASSWORD SPECIFIC STYLES */
+        .password-wrapper { position: relative; }
+        .toggle-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            user-select: none;
+        }
+
+        /* STRENGTH METER (Adapted for Dark Glass) */
+        .strength-meter-container {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        .strength-text {
+            font-size: 0.75rem;
+            text-align: right;
+            margin-top: 4px;
+            margin-bottom: 0;
+            font-weight: 500;
+            min-height: 14px;
+        }
+
+        /* ALERT MESSAGES */
+        .alert {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #ffb3b3;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
         .btn-submit {
             width: 100%;
             background: #F26722;
@@ -73,59 +162,159 @@
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 1rem;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 0.5rem;
         }
         .btn-submit:hover {
+            background: #e05a18;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(242, 103, 34, 0.3);
         }
+        
         .login-link {
             display: block;
             text-align: center;
             margin-top: 1.5rem;
-            color: #061e47;
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 0.9rem;
+            transition: color 0.2s;
         }
-        .login-link:hover { text-decoration: underline; color: #F26722; }
+        .login-link:hover { color: #F26722; }
+
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover {
+            color: #F26722; /* Lights up orange on hover */
+        }
+
+        .back-btn:hover svg {
+            transform: translateX(-5px); /* Cute slide-left animation */
+        }
     </style>
 </head>
 <body>
+    <!-- Floating Back Button -->
+    <a href="{% url 'home' %}" class="back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+    </a>
 
-    <div class="brand-panel">
-        <h1>Welcome to <em>NexaTest</em></h1>
-        <p>Student Portal Registration. Create an account to access your assigned examinations and track your results.</p>
+    <!-- Background Decoration -->
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+
+    <div class="glass-card">
+        <h2><em>Nexa</em>Test</h2>
+        <p>Create your student account</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="pwdInput" required oninput="checkStrength()">
+                    <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+                </div>
+                <!-- Strength Meter -->
+                <div class="strength-meter-container">
+                    <div class="strength-bar" id="strengthBar"></div>
+                </div>
+                <p class="strength-text" id="strengthText"></p>
+            </div>
+
+            <button type="submit" class="btn-submit">Sign Up</button>
+        </form>
+        
+        <a href="{% url 'login' %}" class="login-link">Already have an account? Log in here</a>
     </div>
 
-    <div class="form-panel">
-        <div class="signup-card">
-            <h2>Sign Up</h2>
+    <script>
+        // Toggle Show/Hide Password
+        function togglePassword() {
+            const pwd = document.getElementById("pwdInput");
+            const eye = document.querySelector(".toggle-eye");
             
-            <form method="POST">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" required>
-                </div>
+            if (pwd.type === "password") {
+                pwd.type = "text";
+                eye.textContent = "🙈"; 
+            } else {
+                pwd.type = "password";
+                eye.textContent = "👁️"; 
+            }
+        }
 
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" required>
-                </div>
-
-                <button type="submit" class="btn-submit">Create Account</button>
-            </form>
+        // Live Password Strength Meter
+        function checkStrength() {
+            const pwd = document.getElementById("pwdInput").value;
+            const bar = document.getElementById("strengthBar");
+            const text = document.getElementById("strengthText");
             
-            <a href="{% url 'login' %}" class="login-link">Already have an account? Log in here.</a>
-        </div>
-    </div>
+            let strength = 0;
+            
+            if (pwd.length > 5) strength += 1;
+            if (pwd.length > 8) strength += 1;
+            if (/[A-Z]/.test(pwd)) strength += 1;
+            if (/[0-9]/.test(pwd)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(pwd)) strength += 1;
 
+            if (pwd.length === 0) {
+                bar.style.width = "0%";
+                text.textContent = "";
+            } else if (strength <= 2) {
+                bar.style.width = "33%";
+                bar.style.backgroundColor = "#ef4444"; // Red
+                text.textContent = "Weak";
+                text.style.color = "#ef4444";
+            } else if (strength === 3 || strength === 4) {
+                bar.style.width = "66%";
+                bar.style.backgroundColor = "#F26722"; // Orange
+                text.textContent = "Medium";
+                text.style.color = "#F26722";
+            } else {
+                bar.style.width = "100%";
+                bar.style.backgroundColor = "#22c55e"; // Green
+                text.textContent = "Strong";
+                text.style.color = "#22c55e";
+            }
+        }
+    </script>
 </body>
 </html>

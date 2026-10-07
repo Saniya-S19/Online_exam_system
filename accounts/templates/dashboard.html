@@ -1,198 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NexaTest - Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - NexaTest</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #061e47; color: #ffffff; display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); border-right: 1px solid rgba(255, 255, 255, 0.05); display: flex; flex-direction: column; padding: 2rem 1.5rem; position: fixed; height: 100vh; left: 0; top: 0; }
+        .brand { font-size: 1.8rem; font-weight: 700; color: white; text-decoration: none; margin-bottom: 3rem; text-align: center; }
+        .brand em { color: #F26722; font-style: normal; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
         
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: #ffffff; 
-            min-height: 100vh;
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box;
-        }
+        /* Notice we changed href to "#" and added onclick events */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 1rem; color: rgba(255, 255, 255, 0.6); text-decoration: none; font-weight: 500; border-radius: 8px; transition: all 0.3s ease; cursor: pointer; }
+        .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-item:hover, .nav-item.active { color: #F26722; background: rgba(242, 103, 34, 0.1); }
+        .spacer { flex-grow: 1; }
 
-        .app-window {
-            width: 100%;
-            max-width: 100%; 
-            height: 100vh; 
-            background: #ffffff;
-            border-radius: 0; 
-            box-shadow: none; 
-            display: flex;
-            overflow: hidden;
-        }
+        /* MAIN CONTENT */
+        .main-content { flex: 1; margin-left: 260px; display: flex; flex-direction: column; }
+        .topbar { display: flex; justify-content: flex-end; align-items: center; padding: 1.5rem 3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 1.5rem; }
+        .student-badge { background: rgba(255, 255, 255, 0.1); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+        .logout-btn { color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.5rem 1rem; border-radius: 6px; transition: all 0.3s; }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #ef4444; }
 
-        /* 3. The Deep Indigo Left Sidebar */
-        .sidebar {
-            width: 260px;
-            background: #5c59ad;
-            color: white;
-            padding: 2rem 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            padding: 0 2rem;
-            margin-bottom: 3rem;
-            letter-spacing: -0.5px;
-        }
-        .nav-item {
-            padding: 1rem 2rem;
-            color: #d1d0e8;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left: 4px solid white;
-        }
+        .content-container { padding: 3rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .dashboard-header { margin-bottom: 2rem; }
+        .dashboard-header h1 { font-size: 2.2rem; margin: 0 0 0.5rem 0; font-weight: 700; }
+        .dashboard-header p { color: rgba(255, 255, 255, 0.6); font-size: 1.1rem; margin: 0; }
 
-        .main-content {
-            flex: 1;
-            padding: 2.5rem 3rem;
-            background: #ffffff;
-            overflow-y: auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        .header h1 {
-            color: #433c82;
-            margin: 0;
-            font-size: 1.75rem;
-        }
+        /* MAGIC CSS: Hides sections by default, shows the active one */
+        .tab-section { display: none; animation: fadeIn 0.4s; }
+        .tab-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 5. The Floating Exam Cards */
-        .exam-card {
-            border-radius: 16px;
-            padding: 1.75rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform 0.2s;
-        }
-        .exam-card:hover { transform: translateY(-3px); }
-        
-        /* Alternating Colors just like the reference image */
-        .card-white { background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .card-purple { background: #f6edfd; }
-        .card-pink { background: #fcecf0; }
-        
-        .exam-info h3 { color: #1e1b4b; margin: 0 0 0.5rem 0; font-size: 1.25rem; }
-        .exam-info p { color: #6b7280; font-size: 0.875rem; margin: 0; }
-        
-        .btn-arrow {
-            background: #a78bfa;
-            color: white;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(167, 139, 250, 0.4);
-            transition: background 0.2s;
-        }
-        .btn-arrow:hover { background: #8b5cf6; }
+        /* DASHBOARD STYLES */
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 1.2rem; }
+        .stat-icon { background: rgba(242, 103, 34, 0.1); color: #F26722; width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .stat-icon svg { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: white; line-height: 1.2; }
+        .stat-label { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; font-weight: 600; }
+        .chart-container { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 3rem; height: 350px; }
 
-        /* 6. The Right Sidebar (Calendar/Profile area) */
-        .right-sidebar {
-            width: 300px;
-            padding: 2.5rem;
-            background: #ffffff;
-            border-left: 1px solid #f3f4f6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .profile-img {
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            background: #e0e7ff;
-            margin-bottom: 1rem;
-        }
-        .profile-name { color: #1e1b4b; font-weight: 600; margin: 0; }
-        .profile-id { color: #9ca3af; font-size: 0.8rem; margin-top: 0.25rem; }
+        /* EXAM STYLES */
+        .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem; }
+        .exam-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.8rem; display: flex; flex-direction: column; position: relative; transition: 0.3s; }
+        .exam-card:hover { transform: translateY(-5px); border-color: rgba(242, 103, 34, 0.5); }
+        .exam-title { font-size: 1.3rem; font-weight: 600; margin: 0 0 1rem 0; }
+        .exam-meta { display: flex; justify-content: space-between; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .meta-item { display: flex; flex-direction: column; gap: 4px; }
+        .meta-label { font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; }
+        .meta-value { font-size: 0.95rem; font-weight: 500; }
+        .btn-start { width: 100%; background: #F26722; color: white; text-align: center; text-decoration: none; padding: 0.8rem; border-radius: 6px; font-weight: 600; margin-top: auto; }
+        .empty-state { grid-column: 1 / -1; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 4rem 2rem; text-align: center; color: rgba(255, 255, 255, 0.5); }
+
+        /* TABLE STYLES */
+        .table-container { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead { background: rgba(0, 0, 0, 0.2); }
+        th { padding: 1.2rem 1.5rem; font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        td { padding: 1.2rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.95rem; }
+        .status { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; display: inline-block; }
+        .status-pass { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .status-fail { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
     </style>
 </head>
 <body>
 
-    <div class="app-window">
-        
-        <!-- LEFT SIDEBAR -->
-        <div class="sidebar">
-            <div class="logo">NexaTest</div>
-            <a href="{% url 'dashboard' %}" class="nav-item active">Dashboard</a>
-            <a href="#" class="nav-item">All Exams</a>
-            <a href="#" class="nav-item">Results</a>
-            <div style="flex: 1;"></div> <!-- Pushes settings to the bottom -->
-            <a href="#" class="nav-item">Settings</a>
-            <a href="{% url 'logout' %}" class="nav-item">Logout</a>
-        </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <a href="#" class="brand"><em>Nexa</em>Test</a>
+        <ul class="nav-links">
+            <li><a class="nav-item active" onclick="showTab('dashboard-tab', this)"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Dashboard</a></li>
+            <li><a class="nav-item" onclick="showTab('exams-tab', this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> My Exams</a></li>
+            <li><a class="nav-item" onclick="showTab('results-tab', this)"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Results</a></li>
+        </ul>
+        <div class="spacer"></div>
+    </aside>
 
-        <!-- MAIN CONTENT (EXAM CARDS) -->
-        <div class="main-content">
-            <div class="header">
-                <h1>Available Exams</h1>
-            </div>
+    <main class="main-content">
+        <header class="topbar">
+            <span class="student-badge">🎓 Student Portal</span>
+            <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
+        </header>
 
-            {% if messages %}
-                <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
-                    {% for message in messages %}{{ message }}{% endfor %}
-                </div>
-            {% endif %}
-
-            {% for course in courses %}
-                <div class="exam-card 
-                    {% if forloop.counter|divisibleby:3 %}card-pink
-                    {% elif forloop.counter|divisibleby:2 %}card-purple
-                    {% else %}card-white{% endif %}">
-                    
-                    <div class="exam-info">
-                        <h3>{{ course.course_name }}</h3>
-                        <p>Total Marks: {{ course.total_marks }} &nbsp;&bull;&nbsp; Online Assessment</p>
-                    </div>
-                    
-                    <a href="{% url 'take_exam' course.id %}" class="btn-arrow">&rarr;</a>
-                </div>
-            {% empty %}
-                <p style="color: #9ca3af;">No exams available right now.</p>
-            {% endfor %}
-        </div>
-
-        <div class="right-sidebar">
-            <div class="profile-img"></div>
-            <p class="profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</p>
-            <p class="profile-id">Student ID: {{ request.user.id }}</p>
+        <div class="content-container">
             
-            <div style="margin-top: 3rem; width: 100%;">
-                <h4 style="color: #433c82; margin-bottom: 1rem;">Your Stats</h4>
-                <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
-                    <span style="color: #6b7280; font-size: 0.9rem;">Completed Exams</span>
-                    <strong style="color: #1e1b4b;">3</strong>
+            <!-- ===================== SECTION 1: DASHBOARD ===================== -->
+            <div id="dashboard-tab" class="tab-section active">
+                <div class="dashboard-header">
+                    <h1>Welcome back, {{ request.user.username }}!</h1>
+                    <p>Here is your academic overview for today.</p>
                 </div>
-                <div style="background: #f8fafc; padding: 1rem; border-radius: 12px; display: flex; justify-content: space-between;">
-                    <span style="color: #6b7280; font-size: 0.9rem;">Average Score</span>
-                    <strong style="color: #1e1b4b;">85%</strong>
+                <div class="analytics-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg></div>
+                        <div class="stat-info"><span class="stat-value">{{ courses|length }}</span><span class="stat-label">Exams Assigned</span></div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
                 </div>
             </div>
+
+            <!-- ===================== SECTION 2: MY EXAMS ===================== -->
+            <div id="exams-tab" class="tab-section">
+                <div class="dashboard-header">
+                    <h1>My Examinations</h1>
+                    <p>Browse and manage all your assigned tests.</p>
+                </div>
+                <div class="exam-grid">
+                    {% for course in courses %}
+                        <div class="exam-card">
+                            <h3 class="exam-title">{{ course.course_name }}</h3>
+                            <div class="exam-meta">
+                                <div class="meta-item"><span class="meta-label">Total Marks</span><span class="meta-value">{{ course.total_marks }}</span></div>
+                                <div class="meta-item"><span class="meta-label">Time Limit</span><span class="meta-value">{{ course.time_limit }} Mins</span></div>
+                            </div>
+                            <a href="{% url 'take_exam' course.id %}" class="btn-start">Start Examination</a>
+                        </div>
+                    {% empty %}
+                        <div class="empty-state"><h3>No Exams Found</h3></div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ===================== SECTION 3: RESULTS ===================== -->
+            <div id="results-tab" class="tab-section">
+                <div class="dashboard-header">
+                    <h1>Performance Results</h1>
+                    <p>Review your scores from past examinations.</p>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>Examination</th><th>Date</th><th>Score</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dummy Data for now -->
+                            <tr><td>Advanced Python</td><td>Oct 5, 2026</td><td style="font-weight: 700;">92/100</td><td><span class="status status-pass">Pass</span></td></tr>
+                            <tr><td>Data Structures</td><td>Sep 15, 2026</td><td style="font-weight: 700; color: #ef4444;">35/100</td><td><span class="status status-fail">Fail</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
+    </main>
 
-    </div>
+    <!-- JAVASCRIPT: Handles Tab Switching and the Chart -->
+    <script>
+        // 1. Function to switch between tabs instantly
+        function showTab(tabId, element) {
+            // Hide all sections
+            document.querySelectorAll('.tab-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Remove 'active' color from all sidebar links
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+            
+            // Show the clicked section and highlight the sidebar link
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+        }
 
+        // 2. Render the Chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(242, 103, 34, 0.4)');
+        gradient.addColorStop(1, 'rgba(242, 103, 34, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                datasets: [{
+                    label: 'Score (%)', data: [65, 70, 68, 85, 82, 90],
+                    borderColor: '#F26722', backgroundColor: gradient, borderWidth: 3,
+                    fill: true, tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { max: 100 } } }
+        });
+    </script>
 </body>
 </html>

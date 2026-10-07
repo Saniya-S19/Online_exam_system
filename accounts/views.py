@@ -72,17 +72,12 @@ def logout_view(request):
 
 @login_required(login_url='login')
 def dashboard(request):
-    my_courses = request.user.enrolled_courses.all()
-    past_results = Result.objects.filter(student=request.user).order_by('-date_taken')
-    taken_exam_ids = past_results.values_list('exam_id', flat=True)
-
-    context = {
-        'courses': my_courses, 
-        'past_results': past_results,
-        'taken_exam_ids': taken_exam_ids,
-    }
+    if getattr(request.user, 'is_teacher', False):
+        return redirect('teacher_dashboard')
+        
+    assigned_courses = Course.objects.filter(enrolled_students=request.user)
     
-    return render(request, 'dashboard.html', context)
+    return render(request, 'dashboard.html', {'courses': assigned_courses})
 
 @login_required(login_url='login')
 def take_exam(request, course_id):
@@ -229,7 +224,7 @@ def add_course(request):
             course = form.save(commit=False)
             course.teacher = request.user
             course.save()
-            
+            form.save_m2m()
             messages.success(request, f'Exam "{course.course_name}" created! Now add some questions.')
             return redirect('add_question', course_id=course.id)
     else:
@@ -349,3 +344,4 @@ def manage_students(request, course_id):
         'course': course,
         'students': students
     })
+
