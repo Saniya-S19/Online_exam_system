@@ -1,66 +1,930 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NexaTest - {{ course.course_name }}</title>
-</head>
-<body>
-    <div style="background: #fee2e2; color: #b91c1c; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 700; display: inline-block; margin-bottom: 1.5rem;">
-    ⏱️ Time Remaining: <span id="time-display">Loading...</span>
-    </div>
-    <h2>Exam: {{ course.course_name }}</h2>
-    <p>Total Marks: {{ course.total_marks }}</p>
-
-
-    <form method="POST" id="examForm">
-        {% csrf_token %}
-        
-        {% for q in questions %}
-            <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
-                <p>
-                    <strong>
-                        {{ forloop.counter }}. {{ q.question_text }}
-                    </strong>
-                </p>
-
-                <input type="radio" name="question_{{ q.id }}" value="{{ q.option1 }}" required> {{ q.option1 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="{{ q.option2 }}"> {{ q.option2 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="{{ q.option3 }}"> {{ q.option3 }}<br>
-                <input type="radio" name="question_{{ q.id }}" value="{{ q.option4 }}"> {{ q.option4 }}<br>
-            </div>
-        {% endfor %}
-        
-        <button type="submit" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px;">Submit Exam</button>
-    </form>
-
-    <script>
-    let timeInSeconds = {{ course.time_limit }} * 60; 
-    
-
-    const timeDisplay = document.getElementById('time-display');
-    const examForm = document.getElementById('examForm'); 
-
-    const countdown = setInterval(function() {
-        timeInSeconds--;
-
-        let minutes = Math.floor(timeInSeconds / 60);
-        let seconds = timeInSeconds % 60;
-
-        if (seconds < 10) {
-            seconds = "0" + seconds;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam: {{ course.course_name }} - NexaTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-navy: #061e47;
+            --accent-orange: #F26722;
+            --accent-orange-hover: #e05a18;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
-        timeDisplay.textContent = minutes + ":" + seconds;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-navy);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-        if (timeInSeconds <= 0) {
-            clearInterval(countdown); 
-            timeDisplay.textContent = "0:00";
-            alert("Time is up! Submitting your exam automatically.");
-            
-            if(examForm) {
-                examForm.submit();
+        /* TOP PROCTORING & TIMER BAR */
+        .exam-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(6, 30, 71, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .exam-title-box h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .exam-title-box span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .proctor-badges {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .badge-ai {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .badge-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(52, 211, 153, 0.7);
+            animation: pulseDot 1.6s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+
+        .badge-warning {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(242, 103, 34, 0.15);
+            color: var(--accent-orange);
+            border: 1px solid rgba(242, 103, 34, 0.35);
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-box.timer-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.5);
+            animation: timerAlert 1s infinite alternate;
+        }
+
+        @keyframes timerAlert {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
+        /* MAIN EXAM LAYOUT */
+        .exam-container {
+            max-width: 1100px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        /* QUESTIONS LIST */
+        .questions-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .question-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .question-card.active-question {
+            border-color: rgba(242, 103, 34, 0.5);
+            box-shadow: 0 0 15px rgba(242, 103, 34, 0.1);
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+        }
+
+        .q-number {
+            background: rgba(242, 103, 34, 0.2);
+            color: var(--accent-orange);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .q-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-top: 0.5rem;
+            color: #ffffff;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* CLICKABLE OPTION CARDS */
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .option-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(242, 103, 34, 0.4);
+            transform: translateX(3px);
+        }
+
+        .option-label input[type="radio"] {
+            display: none;
+        }
+
+        .option-indicator {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .option-indicator::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            transform: scale(0);
+            transition: transform 0.2s ease;
+        }
+
+        .option-label.selected {
+            background: rgba(242, 103, 34, 0.12);
+            border-color: var(--accent-orange);
+        }
+
+        .option-label.selected .option-indicator {
+            border-color: var(--accent-orange);
+        }
+
+        .option-label.selected .option-indicator::after {
+            transform: scale(1);
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+
+        /* SIDEBAR CONTROLS */
+        .exam-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* PROGRESS */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.6rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-orange);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        /* QUESTION PALETTE */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .palette-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .palette-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .palette-btn.answered {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #34d399;
+        }
+
+        /* AI PROCTOR CAMERA FEED */
+        .cam-feed-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #020b1c;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 0.5rem;
+        }
+
+        #cam-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .cam-placeholder {
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .cam-btn {
+            margin-top: 0.5rem;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cam-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ai-face-box {
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border: 2px dashed rgba(52, 211, 153, 0.7);
+            border-radius: 8px;
+            pointer-events: none;
+            display: none;
+            animation: scanGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes scanGlow {
+            0%, 100% { border-color: rgba(52, 211, 153, 0.4); }
+            50% { border-color: rgba(52, 211, 153, 0.9); }
+        }
+
+        /* SUBMIT BUTTON */
+        .btn-submit-exam {
+            width: 100%;
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(242, 103, 34, 0.3);
+            transition: all 0.2s ease;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit-exam:hover {
+            background: var(--accent-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(242, 103, 34, 0.4);
+        }
+
+        /* MODAL POPUPS */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+
+        .modal-box {
+            background: #0b224d;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            max-width: 480px;
+            width: 100%;
+            padding: 2.2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #ffffff;
+        }
+
+        .modal-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.75rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-modal-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-modal-confirm {
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-confirm:hover {
+            background: var(--accent-orange-hover);
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-notify {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e293b;
+            color: #ffffff;
+            border-left: 4px solid var(--accent-orange);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 860px) {
+            .exam-container {
+                grid-template-columns: 1fr;
+            }
+            .exam-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .proctor-badges {
+                width: 100%;
+                justify-content: space-between;
             }
         }
-    }, 1000);
-</script>
+    </style>
+</head>
+<body>
+
+    <!-- TOP PROCTORING & TIMER BAR -->
+    <header class="exam-topbar">
+        <div class="exam-title-box">
+            <h1>{{ course.course_name }}</h1>
+            <span>Assessment &bull; {{ questions|length }} Questions &bull; {{ course.total_marks }} Marks</span>
+        </div>
+
+        <div class="proctor-badges">
+            <div class="badge-ai" title="AI Proctoring is actively monitoring focus and browser activity">
+                <span class="badge-pulse"></span>
+                <span>AI Proctor Active</span>
+            </div>
+
+            <div class="badge-warning" id="tab-warning-badge" title="Violations recorded by the AI proctor">
+                <span>⚠️ Tab Switches: <strong id="switch-count">0</strong></span>
+            </div>
+
+            <div class="timer-box" id="timerBox">
+                <span>⏱️</span>
+                <span id="time-display">--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN EXAM LAYOUT -->
+    <div class="exam-container">
+        
+        <!-- QUESTIONS COLUMN -->
+        <main class="questions-column">
+            <form method="POST" id="examForm">
+                {% csrf_token %}
+                
+                {% for q in questions %}
+                    <section class="question-card" id="qcard-{{ forloop.counter }}">
+                        <div class="q-header">
+                            <div>
+                                <span class="q-number">Question {{ forloop.counter }} of {{ questions|length }}</span>
+                                <h3 class="q-text">{{ q.question_text }}</h3>
+                            </div>
+                        </div>
+
+                        <div class="options-list">
+                            <!-- Option 1 -->
+                            <label class="option-label" onclick="selectOption(this, '{{ q.id }}', '{{ forloop.counter }}')">
+                                <input type="radio" name="question_{{ q.id }}" value="{{ q.option1 }}">
+                                <span class="option-indicator"></span>
+                                <span class="option-text"><strong>A.</strong> {{ q.option1 }}</span>
+                            </label>
+
+                            <!-- Option 2 -->
+                            <label class="option-label" onclick="selectOption(this, '{{ q.id }}', '{{ forloop.counter }}')">
+                                <input type="radio" name="question_{{ q.id }}" value="{{ q.option2 }}">
+                                <span class="option-indicator"></span>
+                                <span class="option-text"><strong>B.</strong> {{ q.option2 }}</span>
+                            </label>
+
+                            <!-- Option 3 -->
+                            <label class="option-label" onclick="selectOption(this, '{{ q.id }}', '{{ forloop.counter }}')">
+                                <input type="radio" name="question_{{ q.id }}" value="{{ q.option3 }}">
+                                <span class="option-indicator"></span>
+                                <span class="option-text"><strong>C.</strong> {{ q.option3 }}</span>
+                            </label>
+
+                            <!-- Option 4 -->
+                            <label class="option-label" onclick="selectOption(this, '{{ q.id }}', '{{ forloop.counter }}')">
+                                <input type="radio" name="question_{{ q.id }}" value="{{ q.option4 }}">
+                                <span class="option-indicator"></span>
+                                <span class="option-text"><strong>D.</strong> {{ q.option4 }}</span>
+                            </label>
+                        </div>
+                    </section>
+                {% empty %}
+                    <div class="question-card" style="text-align: center; padding: 3rem;">
+                        <p style="color: var(--text-muted); font-size: 1.1rem;">No questions have been configured for this exam yet.</p>
+                        <a href="{% url 'dashboard' %}" style="display: inline-block; margin-top: 1rem; color: var(--accent-orange); text-decoration: none; font-weight: 600;">Return to Dashboard &rarr;</a>
+                    </div>
+                {% endfor %}
+            </form>
+        </main>
+
+        <!-- RIGHT SIDEBAR CONTROLS -->
+        <aside class="exam-sidebar">
+            
+            <!-- Progress Card -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">
+                    <span>📊</span>
+                    <span>Exam Progress</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="answeredCount">0 of {{ questions|length }} Answered</span>
+                    <span id="percentText">0%</span>
+                </div>
+            </div>
+
+            <!-- Question Jump Palette -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">
+                    <span>🧭</span>
+                    <span>Question Navigator</span>
+                </div>
+                <div class="palette-grid">
+                    {% for q in questions %}
+                        <button type="button" class="palette-btn" id="palette-btn-{{ forloop.counter }}" onclick="scrollToQuestion('{{ forloop.counter }}')">
+                            {{ forloop.counter }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- AI Proctor Camera Feed -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">
+                    <span>🤖</span>
+                    <span>AI Video Proctor</span>
+                </div>
+                <div class="cam-feed-box" id="camContainer">
+                    <video id="cam-video" autoplay playsinline muted></video>
+                    <div class="ai-face-box" id="faceBox"></div>
+                    <div class="cam-placeholder" id="camPlaceholder">
+                        <div style="font-size: 1.8rem; margin-bottom: 0.4rem;">📷</div>
+                        <span>Webcam Proctoring</span>
+                    </div>
+                </div>
+                <button type="button" class="cam-btn" id="toggleCamBtn" onclick="toggleWebcam()">
+                    Enable Camera Monitor
+                </button>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="button" class="btn-submit-exam" onclick="promptSubmit()">
+                <span>Submit Exam</span>
+                <span>&rarr;</span>
+            </button>
+
+        </aside>
+
+    </div>
+
+    <!-- AI PROCTOR WARNING MODAL -->
+    <div class="modal-overlay" id="warningModal">
+        <div class="modal-box">
+            <div class="modal-icon">⚠️</div>
+            <h2 class="modal-title" style="color: #f87171;">AI Proctoring Alert</h2>
+            <p class="modal-desc" id="warningDesc">
+                A window blur or tab switch was detected. This incident has been logged. Please keep this exam window focused at all times.
+            </p>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-confirm" onclick="dismissWarning()">I Understand & Return</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBMIT CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-box">
+            <div class="modal-icon">📝</div>
+            <h2 class="modal-title">Ready to Submit?</h2>
+            <p class="modal-desc" id="submitSummary">
+                You have answered 0 of {{ questions|length }} questions. Once submitted, your scores will be permanently recorded.
+            </p>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeSubmitModal()">Review Answers</button>
+                <button type="button" class="btn-modal-confirm" onclick="finalSubmit()">Confirm Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-notify" id="toastNotify">
+        <span id="toastMsg">Action prevented by AI Proctor</span>
+    </div>
+
+    <script>
+        // --- 1. TIMER ENGINE ---
+        let timeInSeconds = {{ course.time_limit }} * 60;
+        const totalDuration = timeInSeconds;
+        const timeDisplay = document.getElementById('time-display');
+        const timerBox = document.getElementById('timerBox');
+        const examForm = document.getElementById('examForm');
+
+        function formatTimer() {
+            let minutes = Math.floor(timeInSeconds / 60);
+            let seconds = timeInSeconds % 60;
+            if (seconds < 10) seconds = "0" + seconds;
+            timeDisplay.textContent = minutes + ":" + seconds;
+
+            if (timeInSeconds <= 60) {
+                timerBox.classList.add('timer-danger');
+            }
+        }
+        formatTimer();
+
+        const countdown = setInterval(function() {
+            timeInSeconds--;
+            formatTimer();
+
+            if (timeInSeconds <= 0) {
+                clearInterval(countdown);
+                timeDisplay.textContent = "0:00";
+                showToast("Time is up! Submitting exam automatically...");
+                setTimeout(function() {
+                    if (examForm) examForm.submit();
+                }, 1000);
+            }
+        }, 1000);
+
+        // --- 2. OPTION CLICKING & PROGRESS TRACKING ---
+        const totalQuestions = {{ questions|length }};
+        const answeredMap = {};
+
+        function selectOption(labelElement, questionId, qIndex) {
+            // Uncheck other options in this card
+            const parentCard = labelElement.closest('.question-card');
+            parentCard.querySelectorAll('.option-label').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Mark clicked label as selected
+            labelElement.classList.add('selected');
+            const radio = labelElement.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+
+            // Mark question answered
+            answeredMap[questionId] = true;
+
+            // Highlight palette button
+            const palBtn = document.getElementById('palette-btn-' + qIndex);
+            if (palBtn) palBtn.classList.add('answered');
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const count = Object.keys(answeredMap).length;
+            const percent = totalQuestions > 0 ? Math.round((count / totalQuestions) * 100) : 0;
+            
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('answeredCount').textContent = count + ' of ' + totalQuestions + ' Answered';
+            document.getElementById('percentText').textContent = percent + '%';
+        }
+
+        function scrollToQuestion(qIndex) {
+            const target = document.getElementById('qcard-' + qIndex);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.classList.add('active-question');
+                setTimeout(() => target.classList.remove('active-question'), 1500);
+            }
+        }
+
+        // --- 3. SUBMISSION HANDLING ---
+        function promptSubmit() {
+            const count = Object.keys(answeredMap).length;
+            const summary = document.getElementById('submitSummary');
+            
+            if (count < totalQuestions) {
+                summary.innerHTML = `<span style="color: #fbbf24; font-weight: 600;">Attention:</span> You have answered <strong>${count} of ${totalQuestions}</strong> questions.<br>Are you sure you want to finish now?`;
+            } else {
+                summary.innerHTML = `Great job! You have answered all <strong>${count} of ${totalQuestions}</strong> questions.<br>Ready to submit your assessment?`;
+            }
+            document.getElementById('submitModal').style.display = 'flex';
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').style.display = 'none';
+        }
+
+        function finalSubmit() {
+            closeSubmitModal();
+            showToast("Submitting your exam...");
+            if (examForm) examForm.submit();
+        }
+
+        // --- 4. AI PROCTORING ENGINE ---
+        let tabViolations = 0;
+        const switchCountElem = document.getElementById('switch-count');
+
+        // Tab switch & focus loss detection
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                handleViolation("Tab switch or minimization detected by AI Proctor.");
+            }
+        });
+
+        window.addEventListener('blur', function() {
+            handleViolation("Window focus lost. Please stay on the exam screen.");
+        });
+
+        function handleViolation(message) {
+            tabViolations++;
+            switchCountElem.textContent = tabViolations;
+
+            const modal = document.getElementById('warningModal');
+            document.getElementById('warningDesc').innerHTML = `<strong>Incident #${tabViolations}:</strong> ${message}<br><br><span style="color: #fbbf24;">Persistent infractions may be flagged for instructor review.</span>`;
+            modal.style.display = 'flex';
+        }
+
+        function dismissWarning() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
+
+        // Anti-cheating listeners (prevent copy, paste, context menu)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            showToast("Right-click is disabled during the proctored exam.");
+        });
+
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            showToast("Copying question text is prohibited.");
+        });
+
+        document.addEventListener('paste', function(e) {
+            e.preventDefault();
+            showToast("Pasting is disabled during the exam.");
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastNotify');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // --- 5. WEBCAM MONITOR TOGGLE ---
+        let stream = null;
+        async function toggleWebcam() {
+            const video = document.getElementById('cam-video');
+            const placeholder = document.getElementById('camPlaceholder');
+            const faceBox = document.getElementById('faceBox');
+            const btn = document.getElementById('toggleCamBtn');
+
+            if (stream) {
+                // Stop camera
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.style.display = 'none';
+                faceBox.style.display = 'none';
+                placeholder.style.display = 'block';
+                btn.textContent = 'Enable Camera Monitor';
+            } else {
+                // Start camera
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    faceBox.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    btn.textContent = 'Disable Camera Monitor';
+                    showToast("AI Webcam Proctor connected and tracking face.");
+                } catch (err) {
+                    showToast("Camera access unavailable. AI Focus Monitoring remains active.");
+                }
+            }
+        }
+    </script>
 </body>
 </html>

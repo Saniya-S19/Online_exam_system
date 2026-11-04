@@ -3,98 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Students - {{ course.course_name }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Manage Students - {{ course.course_name }} - NexaTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-navy: #061e47;
+            --accent-orange: #F26722;
+            --accent-orange-hover: #e05a18;
+            --card-border: rgba(255, 255, 255, 0.12);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background-color: #061e47; 
+            background-color: var(--bg-navy); 
             color: #ffffff;
             padding: 3rem 1rem;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
+
         .container {
             width: 100%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 8px;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
-        h2 { font-weight: 400; margin-top: 0; margin-bottom: 2rem; }
-        h2 em { color: #F26722; font-style: normal; font-weight: 700; }
-        
+
+        h2 { font-size: 1.8rem; font-weight: 800; margin: 0 0 0.4rem 0; }
+        h2 em { color: var(--accent-orange); font-style: normal; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+        /* CONTROLS BAR */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+        }
+
+        .btn-toggle-all {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-toggle-all:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* STUDENT LIST */
         .student-list {
             list-style: none;
             padding: 0;
-            margin-bottom: 2rem;
+            margin: 0 0 2rem 0;
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.15);
         }
-        .student-list li {
-            background: rgba(255, 255, 255, 0.03);
-            margin-bottom: 0.5rem;
-            padding: 1rem;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .student-list label {
+
+        .student-item {
+            background: transparent;
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             cursor: pointer;
-            font-size: 1.1rem;
+            transition: background 0.2s;
+            user-select: none;
         }
+        .student-item:last-child { border-bottom: none; }
+        .student-item:hover { background: rgba(255, 255, 255, 0.06); }
+        .student-item.selected { background: rgba(242, 103, 34, 0.12); }
+
+        .student-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            cursor: pointer;
+            gap: 12px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
         input[type="checkbox"] {
-            margin-right: 15px;
-            width: 18px;
-            height: 18px;
-            accent-color: #F26722;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-orange);
+            cursor: pointer;
         }
+
+        .counter-badge {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
         .btn-submit {
-            background: #F26722;
+            background: var(--accent-orange);
             color: #ffffff;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 4px;
+            padding: 0.9rem 2rem;
+            border-radius: 6px;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(242, 103, 34, 0.3);
         }
-        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:hover { 
+            background: var(--accent-orange-hover); 
+            transform: translateY(-2px);
+        }
+
         .back-link {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
             text-decoration: none;
-            margin-left: 1rem;
+            margin-left: 1.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .back-link:hover { color: #ffffff; }
+
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Manage Students for <em>{{ course.course_name }}</em></h2>
-        
-        <form method="POST">
+        <h2>Roster for <em>{{ course.course_name }}</em></h2>
+        <p class="subtitle">Assign which students have access to take this examination.</p>
+
+        <div class="controls-bar">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchBox" placeholder="🔍 Search students..." oninput="filterStudents()">
+            </div>
+            <button type="button" class="btn-toggle-all" onclick="toggleSelectAll()">
+                <span id="toggleText">Select All</span>
+            </button>
+        </div>
+
+        <form method="POST" id="enrollForm">
             {% csrf_token %}
-            <ul class="student-list">
+            
+            <ul class="student-list" id="studentList">
                 {% for student in students %}
-                    <li>
-                        <label>
+                    <li class="student-item {% if student.id in enrolled_ids %}selected{% endif %}" onclick="rowClicked(this, event)">
+                        <label class="student-label">
                             <input type="checkbox" name="students" value="{{ student.id }}" 
-                            {% if student in course.enrolled_students.all %}checked{% endif %}>
-                            
-                            {{ student.username }} 
+                            {% if student.id in enrolled_ids %}checked{% endif %} onchange="checkboxChanged(this)">
+                            <span>{{ student.username }}</span>
                         </label>
                     </li>
                 {% empty %}
-                    <p style="color: rgba(255,255,255,0.5);">No students found in the system.</p>
+                    <li style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        No registered student accounts found.
+                    </li>
                 {% endfor %}
             </ul>
-            
+
+            <span class="counter-badge" id="selectedCount">Calculating enrolled students...</span>
+
             <button type="submit" class="btn-submit">Save Enrollments</button>
             <a href="{% url 'teacher_dashboard' %}" class="back-link">Cancel</a>
         </form>
     </div>
 
+    <script>
+        function updateCount() {
+            const checked = document.querySelectorAll('input[name="students"]:checked').length;
+            const total = document.querySelectorAll('input[name="students"]').length;
+            document.getElementById('selectedCount').textContent = `${checked} of ${total} students selected for enrollment`;
+            
+            const toggleText = document.getElementById('toggleText');
+            toggleText.textContent = (checked === total && total > 0) ? 'Deselect All' : 'Select All';
+        }
+        updateCount();
+
+        function checkboxChanged(cb) {
+            const item = cb.closest('.student-item');
+            if (cb.checked) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+            updateCount();
+        }
+
+        function rowClicked(item, event) {
+            if (event.target.tagName.toLowerCase() === 'input') return;
+            const cb = item.querySelector('input[type="checkbox"]');
+            cb.checked = !cb.checked;
+            checkboxChanged(cb);
+        }
+
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('input[name="students"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(cb => {
+                cb.checked = !allChecked;
+                const item = cb.closest('.student-item');
+                if (cb.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            updateCount();
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('.student-item').forEach(item => {
+                const name = item.textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>

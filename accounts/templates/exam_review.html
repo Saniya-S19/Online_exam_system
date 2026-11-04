@@ -1,101 +1,524 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Exam Review - NexaTest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Review - {{ course.course_name }} - NexaTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-navy: #061e47;
+            --accent-orange: #F26722;
+            --accent-orange-hover: #e05a18;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: #f9fafb;
-            color: #374151;
-            margin: 0;
-            padding: 3rem;
+            background-color: var(--bg-navy);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2.5rem 1rem;
             display: flex;
             justify-content: center;
         }
-        .review-container {
+
+        .review-wrapper {
             width: 100%;
-            max-width: 800px;
-            background: #ffffff;
-            border-radius: 12px;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* HEADER SCORE CARD */
+        .score-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
             padding: 2.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .header-box {
             text-align: center;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid #e5e7eb;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
-        .score {
-            font-size: 2.5rem;
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(242, 103, 34, 0.12);
+            border-radius: 50%;
+            top: -100px;
+            right: -50px;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .exam-badge {
+            display: inline-block;
+            background: rgba(242, 103, 34, 0.15);
+            color: var(--accent-orange);
+            font-size: 0.85rem;
             font-weight: 700;
-            color: #5c59ad;
-            margin: 0.5rem 0;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .question-card {
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
+
+        .score-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
         }
-        /* Dynamic Highlight Colors */
-        .correct-card { background-color: #ecfdf5; border-color: #a7f3d0; }
-        .incorrect-card { background-color: #fef2f2; border-color: #fecaca; }
-        
-        .question-text { font-weight: 600; font-size: 1.1rem; margin-top: 0; }
-        .answer-block { margin-top: 0.75rem; font-size: 0.95rem; }
-        
-        .btn-home {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #5c59ad;
-            color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            text-decoration: none;
+
+        .score-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .stat-lbl {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
             font-weight: 600;
-            margin-top: 2rem;
-            transition: background 0.2s;
+            margin-top: 0.3rem;
         }
-        .btn-home:hover { background: #433c82; }
+
+        /* AI PERFORMANCE INSIGHT CARD */
+        .ai-insight-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .ai-icon {
+            font-size: 1.5rem;
+            background: rgba(16, 185, 129, 0.2);
+            padding: 0.5rem;
+            border-radius: 8px;
+            line-height: 1;
+        }
+
+        .ai-insight-text h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #34d399;
+            margin-bottom: 0.3rem;
+        }
+
+        .ai-insight-text p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.5;
+        }
+
+        /* FILTER BUTTONS */
+        .filter-bar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-orange);
+            color: #ffffff;
+            border-color: var(--accent-orange);
+        }
+
+        /* QUESTIONS REVIEW LIST */
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.8rem;
+            transition: all 0.2s;
+        }
+
+        .review-card.is-correct {
+            border-left: 5px solid var(--success);
+            background: rgba(16, 185, 129, 0.04);
+        }
+
+        .review-card.is-incorrect {
+            border-left: 5px solid var(--danger);
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .q-tag-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .q-idx {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .status-pill {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .pill-correct {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .pill-incorrect {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .q-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            color: #ffffff;
+        }
+
+        .answer-meta-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ans-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .ans-lbl {
+            font-weight: 600;
+            color: var(--text-muted);
+            min-width: 120px;
+        }
+
+        /* AI EXPLANATION TOGGLE BUTTON */
+        .btn-ai-explain {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-ai-explain:hover {
+            background: rgba(242, 103, 34, 0.15);
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        .ai-explanation-panel {
+            display: none;
+            margin-top: 1rem;
+            padding: 1.25rem;
+            background: rgba(6, 30, 71, 0.6);
+            border: 1px solid rgba(242, 103, 34, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ai-explanation-panel strong {
+            color: var(--accent-orange);
+        }
+
+        /* ACTIONS */
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn-action-primary {
+            background: var(--accent-orange);
+            color: #ffffff;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(242, 103, 34, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-action-primary:hover {
+            background: var(--accent-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(242, 103, 34, 0.4);
+        }
     </style>
 </head>
 <body>
 
-    <div class="review-container">
-        <div class="header-box">
-            <h1 style="margin: 0; color: #1e1b4b;">Exam Complete: {{ course.course_name }}</h1>
-            <div class="score">Score: {{ score }} / {{ total_marks }}</div>
-            <p style="color: #6b7280; margin: 0;">Review your performance below.</p>
+    <div class="review-wrapper">
+
+        <!-- SCORE CARD -->
+        <div class="score-card">
+            <span class="exam-badge">Assessment Result</span>
+            <h1 class="score-title">{{ course.course_name }}</h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">Detailed Performance Review & AI Feedback</p>
+
+            <div class="score-stats-grid">
+                <div class="stat-item">
+                    <span class="stat-val" style="color: var(--accent-orange);">{{ score }} / {{ total_marks }}</span>
+                    <span class="stat-lbl">Final Score</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val" style="color: #34d399;">
+                        {% widthratio score total_marks 100 %}%
+                    </span>
+                    <span class="stat-lbl">Accuracy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-val">
+                        {% if score >= total_marks|divisibleby:2 %}
+                            <span style="color: #34d399;">PASSED</span>
+                        {% else %}
+                            <span style="color: #f87171;">REVIEW</span>
+                        {% endif %}
+                    </span>
+                    <span class="stat-lbl">Outcome</span>
+                </div>
+            </div>
+
+            <!-- AI Insight Banner -->
+            <div class="ai-insight-box">
+                <div class="ai-icon">🤖</div>
+                <div class="ai-insight-text">
+                    <h4>AI Examiner Assessment</h4>
+                    <p id="aiSummaryText">
+                        Analyzing test answers... Click "Explain with AI" on any question below to study key concepts and learn the reasoning behind the correct response.
+                    </p>
+                </div>
+            </div>
         </div>
 
-        {% for item in review_data %}
-            <div class="question-card {% if item.is_correct %}correct-card{% else %}incorrect-card{% endif %}">
-                <p class="question-text">{{ forloop.counter }}. {{ item.question_obj.question_text }}</p> 
-                
-                <div class="answer-block">
-                    <strong>Your Answer:</strong> 
-                    {% if item.selected_option %}
-                        <span style="color: {% if item.is_correct %}#047857{% else %}#b91c1c{% endif %};">
-                            {{ item.selected_option }}
-                        </span>
-                    {% else %}
-                        <span style="color: #b91c1c;">(Skipped / No Answer)</span>
-                    {% endif %}
-                </div>
-
-                {% if not item.is_correct %}
-                <div class="answer-block">
-                    <strong>Correct Answer:</strong> <span style="color: #047857;">{{ item.question_obj.correct_answer }}</span>
-                </div>
-                {% endif %}
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <button type="button" class="filter-btn active" onclick="filterQuestions('all', this)">All Questions ({{ review_data|length }})</button>
+                <button type="button" class="filter-btn" onclick="filterQuestions('correct', this)">Correct</button>
+                <button type="button" class="filter-btn" onclick="filterQuestions('incorrect', this)">Incorrect / Skipped</button>
             </div>
-        {% endfor %}
+            
+            <a href="{% url 'dashboard' %}" class="btn-action-primary" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+                &larr; Back to Dashboard
+            </a>
+        </div>
 
-        <a href="{% url 'dashboard' %}" class="btn-home">Return to Dashboard</a>
+        <!-- QUESTIONS REVIEW LIST -->
+        <div class="review-list">
+            {% for item in review_data %}
+                <div class="review-card {% if item.is_correct %}is-correct{% else %}is-incorrect{% endif %}" data-status="{% if item.is_correct %}correct{% else %}incorrect{% endif %}">
+                    <div class="q-tag-row">
+                        <span class="q-idx">Question {{ forloop.counter }}</span>
+                        {% if item.is_correct %}
+                            <span class="status-pill pill-correct">&#10003; Correct</span>
+                        {% else %}
+                            <span class="status-pill pill-incorrect">&#10007; Incorrect</span>
+                        {% endif %}
+                    </div>
+
+                    <h3 class="q-title">{{ item.question_obj.question_text }}</h3>
+
+                    <div class="answer-meta-box">
+                        <div class="ans-row">
+                            <span class="ans-lbl">Your Answer:</span>
+                            {% if item.selected_option %}
+                                <strong style="color: {% if item.is_correct %}#34d399{% else %}#f87171{% endif %};">
+                                    {{ item.selected_option }}
+                                </strong>
+                            {% else %}
+                                <span style="color: #f87171; font-style: italic;">(Skipped / No Answer)</span>
+                            {% endif %}
+                        </div>
+
+                        {% if not item.is_correct %}
+                            <div class="ans-row">
+                                <span class="ans-lbl">Correct Answer:</span>
+                                <strong style="color: #34d399;">{{ item.question_obj.correct_answer }}</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- AI Explanation Button -->
+                    <button type="button" class="btn-ai-explain" onclick="toggleExplanation('exp-{{ forloop.counter }}', this)">
+                        <span>✨ Explain with AI</span>
+                    </button>
+
+                    <!-- Hidden AI Explanation Panel -->
+                    <div class="ai-explanation-panel" id="exp-{{ forloop.counter }}">
+                        <strong>🤖 AI Concept Breakdown:</strong><br>
+                        The correct answer is <strong>"{{ item.question_obj.correct_answer }}"</strong>.
+                        {% if item.is_correct %}
+                            Great job! Your selection matches the standard curriculum answer. Make sure to keep this fundamental concept reinforced in subsequent modules.
+                        {% else %}
+                            You selected <em>{% if item.selected_option %}"{{ item.selected_option }}"{% else %}"Skipped"{% endif %}</em>. To master this concept, review the core principle behind "{{ item.question_obj.correct_answer }}" and how it distinguishes from the alternative choices.
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- BOTTOM ACTION -->
+        <div class="action-row">
+            <a href="{% url 'dashboard' %}" class="btn-action-primary">
+                Return to Student Dashboard &rarr;
+            </a>
+        </div>
+
     </div>
 
+    <script>
+        // Filter questions by Correct / Incorrect
+        function filterQuestions(type, btnElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            const cards = document.querySelectorAll('.review-card');
+            cards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else if (type === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Toggle AI Explanation
+        function toggleExplanation(panelId, btnElement) {
+            const panel = document.getElementById(panelId);
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                btnElement.innerHTML = '<span>✨ Explain with AI</span>';
+            } else {
+                panel.style.display = 'block';
+                btnElement.innerHTML = '<span>✨ Hide AI Explanation</span>';
+            }
+        }
+
+        // Tailor AI summary text
+        const score = {{ score }};
+        const total = {{ total_marks }};
+        const ratio = total > 0 ? (score / total) : 0;
+        const summaryElem = document.getElementById('aiSummaryText');
+        
+        if (ratio >= 0.8) {
+            summaryElem.textContent = "Outstanding mastery demonstrated! You scored above 80%. Your theoretical comprehension and problem solving in this course are in the top tier.";
+        } else if (ratio >= 0.5) {
+            summaryElem.textContent = "Solid foundational performance! You have passed the core competencies. Use the AI Concept Breakdown on missed questions to target remaining gaps.";
+        } else {
+            summaryElem.textContent = "Keep practicing! Several core concepts need review. Expand each question's AI Explanation below to understand where points were lost and strengthen your preparation.";
+        }
+    </script>
 </body>
 </html>

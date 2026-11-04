@@ -1,29 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NexaTest - Manage Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if course %}Edit Exam: {{ course.course_name }}{% else %}Create New Exam{% endif %} - NexaTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f3f4f6; display: flex; justify-content: center; padding: 3rem; }
-        .form-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h2 { margin-top: 0; color: #111827; }
-        .form-group p { display: flex; flex-direction: column; margin-bottom: 1rem; }
-        input { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 4px; margin-top: 0.25rem; font-family: 'Inter', sans-serif; }
-        .btn-submit { background: #3b82f6; color: white; border: none; padding: 0.75rem; border-radius: 4px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 1rem; }
-        .btn-cancel { display: block; text-align: center; margin-top: 1rem; color: #6b7280; text-decoration: none; font-weight: 600;}
+        :root {
+            --bg-navy: #061e47;
+            --accent-orange: #F26722;
+            --accent-orange-hover: #e05a18;
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0;
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-navy); 
+            color: #ffffff;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            padding: 2.5rem 1rem; 
+        }
+
+        .form-container { 
+            background: rgba(255, 255, 255, 0.06); 
+            backdrop-filter: blur(16px);
+            padding: 2.5rem 3rem; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
+            width: 100%; 
+            max-width: 540px; 
+            border: 1px solid var(--card-border);
+        }
+
+        h2 { margin: 0 0 0.5rem 0; color: #ffffff; font-size: 1.8rem; font-weight: 800; }
+        h2 em { color: var(--accent-orange); font-style: normal; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        label {
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input { 
+            padding: 0.85rem 1rem; 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 6px; 
+            font-family: inherit; 
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-orange);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-submit { 
+            background: var(--accent-orange); 
+            color: white; 
+            border: none; 
+            padding: 0.95rem; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            font-size: 1.05rem;
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 1rem; 
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(242, 103, 34, 0.3);
+        }
+        .btn-submit:hover { 
+            background: var(--accent-orange-hover); 
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel { 
+            display: block; 
+            text-align: center; 
+            margin-top: 1.25rem; 
+            color: var(--text-muted); 
+            text-decoration: none; 
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .btn-cancel:hover { color: #ffffff; }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h2>{% if course %}Edit Exam: {{ course.course_name }}{% else %}Create New Exam{% endif %}</h2>
+        <h2>{% if course %}Edit <em>{{ course.course_name }}</em>{% else %}Create <em>New Exam</em>{% endif %}</h2>
+        <p class="subtitle">Set the title, total marks, and duration for this examination.</p>
         
         <form method="POST">
             {% csrf_token %}
+            
             <div class="form-group">
-                {{ form.as_p }}
+                <label for="id_course_name">Exam Title / Subject</label>
+                {{ form.course_name }}
             </div>
-            <button type="submit" class="btn-submit">Save Exam</button>
-            <a href="{% url 'teacher_dashboard' %}" class="btn-cancel">Cancel</a>
+
+            <div class="form-group">
+                <label for="id_total_marks">Total Marks</label>
+                {{ form.total_marks }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_time_limit">Time Limit (in Minutes)</label>
+                {{ form.time_limit }}
+            </div>
+
+            <button type="submit" class="btn-submit">
+                {% if course %}Save Exam Changes{% else %}Create Exam &rarr;{% endif %}
+            </button>
+            <a href="{% url 'teacher_dashboard' %}" class="btn-cancel">Cancel and Return</a>
         </form>
     </div>
 </body>

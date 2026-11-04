@@ -1,155 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Dashboard - NexaTest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* 1. Full Screen Body */
+        :root {
+            --primary: #5c59ad;
+            --primary-hover: #4e4a9e;
+            --accent-orange: #F26722;
+            --bg-light: #f8fafc;
+            --card-border: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; }
         body { 
             font-family: 'Inter', sans-serif; 
-            background: #ffffff; 
+            background: var(--bg-light); 
             min-height: 100vh;
             margin: 0; 
             padding: 0; 
-            box-sizing: border-box;
+            color: var(--text-dark);
         }
 
-        /* 2. Full Page App UI */
         .app-window {
             width: 100%;
-            height: 100vh;
-            background: #ffffff;
+            min-height: 100vh;
             display: flex;
-            overflow: hidden;
         }
 
-        /* 3. The Deep Indigo Sidebar */
+        /* SIDEBAR */
         .sidebar {
             width: 260px;
-            background: #5c59ad;
+            background: #1e1b4b;
             color: white;
             padding: 2rem 0;
             display: flex;
             flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 50;
         }
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 800;
             padding: 0 2rem;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
+            color: #ffffff;
             letter-spacing: -0.5px;
         }
+        .logo em { color: var(--accent-orange); font-style: normal; }
+
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
         .nav-item {
-            padding: 1rem 2rem;
-            color: #d1d0e8;
+            padding: 0.9rem 2rem;
+            color: #cbd5e1;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 1rem;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.95rem;
             transition: all 0.2s;
+            cursor: pointer;
+            border-left: 4px solid transparent;
         }
-        .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid white; }
+        .nav-item:hover { color: white; background: rgba(255, 255, 255, 0.06); }
+        .nav-item.active { background: rgba(255, 255, 255, 0.1); color: white; border-left-color: var(--accent-orange); }
 
-        /* 4. Main Content Area */
+        /* MAIN CONTENT AREA */
         .main-content {
             flex: 1;
-            padding: 2.5rem 3rem;
-            background: #f9fafb; /* Slightly off-white to make tables pop */
+            margin-left: 260px;
+            padding: 2.5rem 3.5rem;
             overflow-y: auto;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
-        .header h1 { color: #1e1b4b; margin: 0; font-size: 1.75rem; }
+        .header h1 { color: #0f172a; margin: 0 0 0.3rem 0; font-size: 2rem; font-weight: 800; }
+        .header p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
 
-        /* ADD COURSE BUTTON */
         .btn-add {
-            background: #5c59ad; 
+            background: var(--accent-orange); 
             color: white;
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 1.6rem;
             border-radius: 8px;
             text-decoration: none;
-            font-weight: 600;
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
-            transition: background 0.2s, transform 0.2s;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(242, 103, 34, 0.3);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
         }
-        .btn-add:hover { background: #827eee; transform: translateY(-2px); }
+        .btn-add:hover { background: #e05a18; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(242, 103, 34, 0.4); }
 
-        /* Data Tables */
+        /* METRICS GRID */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .metric-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            background: #ede9fe;
+            color: #6d28d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .metric-info h3 { margin: 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .metric-info span { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+
+        /* TABLES */
         .table-container {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
         }
-        .table-container h2 { margin-top: 0; color: #433c82; font-size: 1.25rem; margin-bottom: 1rem; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { padding: 1rem; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-weight: 600; }
-        td { padding: 1rem; border-bottom: 1px solid #e5e7eb; color: #374151; }
+        .table-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+        .table-container h2 { margin: 0; color: #1e1b4b; font-size: 1.3rem; font-weight: 700; }
         
-        /* Dropdown Menu Container */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 1rem 1.2rem; border-bottom: 2px solid #f1f5f9; color: var(--text-muted); font-weight: 700; font-size: 0.82rem; text-transform: uppercase; }
+        td { padding: 1rem 1.2rem; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 0.95rem; }
+        tr:hover td { background: #f8fafc; }
+
+        /* DROPDOWN MENU */
         .dropdown {
             position: relative;
             display: inline-block;
         }
 
-        /* The Main 'Options' Button */
         .dropdown-btn {
-            background: #f3f4f6;
-            color: #4b5563;
-            padding: 0.5rem 1rem;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 0.55rem 1.1rem;
             border-radius: 6px;
-            border: 1px solid #d1d5db;
+            border: 1px solid #cbd5e1;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
+            font-family: inherit;
+            font-size: 0.88rem;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            user-select: none;
         }
-        .dropdown-btn:hover { background: #e5e7eb; }
+        .dropdown-btn:hover, .dropdown-btn.active {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
 
-         .dropdown-content {
+        .dropdown-content {
             display: none;
             position: absolute;
             right: 0;
-            top: 100%; 
+            top: calc(100% + 4px);
             background-color: #ffffff;
-            min-width: 170px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            min-width: 190px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
             border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            z-index: 999; 
+            border: 1px solid #e2e8f0;
+            z-index: 1000;
             overflow: hidden;
+            animation: dropFade 0.2s ease;
         }
 
-        /* Show the menu on hover */
-        .dropdown:hover .dropdown-content { display: flex; flex-direction: column; }
+        @keyframes dropFade {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Links inside the menu */
+        .dropdown-content.show {
+            display: flex;
+            flex-direction: column;
+        }
+
         .dropdown-content a {
-            color: #374151;
-            padding: 0.75rem 1rem;
+            color: #334155;
+            padding: 0.75rem 1.2rem;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: 500;
-            border-bottom: 1px solid #f3f4f6;
-            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.15s;
         }
         .dropdown-content a:last-child { border-bottom: none; }
-        
-        .dropdown-content a.action-view:hover { color: #6d28d9; background: #ede9fe; }
-        .dropdown-content a.action-edit:hover { color: #6d28d9; background: #ede9fe; }
-        .dropdown-content a.action-add:hover { color: #6d28d9; background: #ede9fe; }
-        .dropdown-content a.action-delete:hover { color: #6d28d9; background: #ede9fe; }
+        .dropdown-content a:hover {
+            background: #f8fafc;
+            color: #4338ca;
+            padding-left: 1.4rem;
+        }
+        .dropdown-content a.action-delete:hover {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        /* ALERTS */
+        .alert-box {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-csv {
+            background: #5c59ad;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-csv:hover {
+            background: #4e4a9e;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 70px; padding: 1.5rem 0.5rem; }
+            .logo { font-size: 1.1rem; padding: 0 0.5rem; text-align: center; }
+            .logo span { display: none; }
+            .nav-item { justify-content: center; padding: 0.8rem; }
+            .nav-item span { display: none; }
+            .main-content { margin-left: 70px; padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -157,60 +285,132 @@
     <div class="app-window">
         
         <!-- SIDEBAR -->
-        <div class="sidebar">
-            <div class="logo">NexaTest Admin</div>
-            <a href="{% url 'teacher_dashboard' %}" class="nav-item active">Dashboard</a>
+        <aside class="sidebar">
+            <div class="logo"><em>Nexa</em><span>Test Admin</span></div>
+            <ul class="nav-links">
+                <li><a href="{% url 'teacher_dashboard' %}" class="nav-item active"><span>📊 Dashboard</span></a></li>
+                <li><a href="{% url 'add_course' %}" class="nav-item"><span>➕ New Exam</span></a></li>
+                <li><a href="{% url 'export_results_csv' %}" class="nav-item"><span>📥 Export CSV</span></a></li>
+            </ul>
             <div style="flex: 1;"></div>
-            <a href="{% url 'logout' %}" class="nav-item">Logout</a>
-        </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'logout' %}" class="nav-item" style="color: #fca5a5;"><span>🚪 Logout</span></a></li>
+            </ul>
+        </aside>
 
         <!-- MAIN CONTENT -->
-        <div class="main-content">
+        <main class="main-content">
             
             <div class="header">
-                <h1>Instructor Dashboard</h1>
-                <!-- HERE IS THE ADD COURSE BUTTON -->
-                <a href="{% url 'add_course' %}" class="btn-add">+ Create New Exam</a>
+                <div>
+                    <h1>Instructor Portal</h1>
+                    <p>Manage examinations, author curriculum questions, and view student submissions.</p>
+                </div>
+                <a href="{% url 'add_course' %}" class="btn-add">
+                    <span>+</span> Create New Exam
+                </a>
             </div>
 
             {% if messages %}
-                <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 8px; margin-bottom: 2rem;">
-                    {% for message in messages %}{{ message }}{% endfor %}
-                </div>
+                {% for message in messages %}
+                    <div class="alert-box">
+                        <span>ℹ️</span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
             {% endif %}
+
+            <!-- METRICS GRID -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">👥</div>
+                    <div class="metric-info">
+                        <h3>{{ total_students }}</h3>
+                        <span>Enrolled Students</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: #e0f2fe; color: #0284c7;">📝</div>
+                    <div class="metric-info">
+                        <h3>{{ total_exams_created }}</h3>
+                        <span>Exams Created</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: #dcfce7; color: #16a34a;">🎯</div>
+                    <div class="metric-info">
+                        <h3>{{ total_exams_taken }}</h3>
+                        <span>Completed Attempts</span>
+                    </div>
+                </div>
+            </div>
 
             <!-- MANAGE EXAMS TABLE -->
             <div class="table-container">
-                <h2>Manage Exams</h2>
+                <div class="table-header-row">
+                    <h2>Manage Examinations</h2>
+                    <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 500;">
+                        {{ courses|length }} total courses
+                    </span>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
-                            <th>Exam Name</th>
+                            <th>Exam Title</th>
                             <th>Total Marks</th>
+                            <th>Time Limit</th>
+                            <th>Enrolled</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for course in courses %}
                             <tr>
-                                <td><strong>{{ course.course_name }}</strong></td>
-                                <td>{{ course.total_marks }}</td>
+                                <td>
+                                    <strong style="color: #0f172a; font-size: 1rem;">{{ course.course_name }}</strong>
+                                </td>
+                                <td>{{ course.total_marks }} Marks</td>
+                                <td>{{ course.time_limit }} Mins</td>
+                                <td>
+                                    <span style="background: #f1f5f9; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem;">
+                                        {{ course.enrolled_students.count }} Students
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="dropdown">
-                                        <button class="dropdown-btn">Options <span>&#9662;</span></button>
+                                        <button type="button" class="dropdown-btn" onclick="toggleDropdown(this, event)">
+                                            <span>Options</span>
+                                            <span>&#9662;</span>
+                                        </button>
                                         <div class="dropdown-content">
-                                            <a href="{% url 'course_questions' course.id %}" class="action-view"> View Questions</a>
-                                            <a href="{% url 'edit_course' course.id %}" class="action-edit"> Edit Name</a>
-                                            <a href="{% url 'add_question' course.id %}" class="action-add">Add Questions </a>
-                                            <a href="{% url 'delete_course' course.id %}" class="action-delete"> Delete Exam</a>
-                                            <a href="{% url 'manage_students' course.id %}" style="color: #F26722; text-decoration: none; font-weight: 600; margin-left: 15px;">Manage Students</a>
+                                            <a href="{% url 'course_questions' course.id %}">
+                                                <span>📋</span> View Questions
+                                            </a>
+                                            <a href="{% url 'add_question' course.id %}">
+                                                <span>➕</span> Add Questions
+                                            </a>
+                                            <a href="{% url 'edit_course' course.id %}">
+                                                <span>✏️</span> Edit Exam Details
+                                            </a>
+                                            <a href="{% url 'manage_students' course.id %}">
+                                                <span>👥</span> Manage Students
+                                            </a>
+                                            <a href="{% url 'export_results_csv_course' course.id %}">
+                                                <span>📊</span> Export CSV
+                                            </a>
+                                            <a href="{% url 'delete_course' course.id %}" class="action-delete">
+                                                <span>🗑️</span> Delete Exam
+                                            </a>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" style="text-align: center; color: #9ca3af;">No exams created yet.</td>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                    No exams created yet. Click "+ Create New Exam" to author your first assessment!
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -219,43 +419,81 @@
 
             <!-- STUDENT RESULTS TABLE -->
             <div class="table-container">
-                
-                <!-- Header with Title and Download Button -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h2 style="margin: 0;">Recent Student Results</h2>
-                    <a href="{% url 'export_results_csv' %}" class="btn-add" style="background: #5c59ad; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);">
-                        Download CSV
+                <div class="table-header-row">
+                    <div>
+                        <h2>Student Submissions</h2>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+                            Real-time records of all student assessments taken.
+                        </p>
+                    </div>
+                    <a href="{% url 'export_results_csv' %}" class="btn-csv">
+                        <span>📥</span> Download Full CSV
                     </a>
                 </div>
 
-                <!-- The Results Table -->
                 <table>
                     <thead>
                         <tr>
                             <th>Student</th>
                             <th>Exam</th>
                             <th>Score</th>
+                            <th>Date Taken</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in results %}
                             <tr>
-                                <td>{{ result.student.username }}</td>
+                                <td><strong>{{ result.student.username }}</strong></td>
                                 <td>{{ result.exam.course_name }}</td>
-                                <td><strong>{{ result.marks_scored }}</strong></td> 
+                                <td>
+                                    <span style="font-weight: 700; color: #5c59ad;">
+                                        {{ result.marks_scored }} / {{ result.exam.total_marks }}
+                                    </span>
+                                </td>
+                                <td>{{ result.date_taken|date:"M d, Y H:i" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" style="text-align: center; color: #9ca3af;">No results yet.</td>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                    No student test submissions recorded yet.
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                
             </div>
 
-        </div>
+        </main>
     </div>
 
+    <script>
+        // Dropdown toggle mechanism supporting click & outside click
+        function toggleDropdown(btn, event) {
+            event.stopPropagation();
+            const parent = btn.closest('.dropdown');
+            const menu = parent.querySelector('.dropdown-content');
+            const isOpen = menu.classList.contains('show');
+
+            // Close any open dropdowns first
+            closeAllDropdowns();
+
+            if (!isOpen) {
+                menu.classList.add('show');
+                btn.classList.add('active');
+            }
+        }
+
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-content.show').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.dropdown-btn.active').forEach(el => el.classList.remove('active'));
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                closeAllDropdowns();
+            }
+        });
+    </script>
 </body>
 </html>

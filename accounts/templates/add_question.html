@@ -3,105 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Question - {{ course.course_name }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>{% if question %}Edit{% else %}Add{% endif %} Question - {{ course.course_name }} - NexaTest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-navy: #061e47;
+            --accent-orange: #F26722;
+            --accent-orange-hover: #e05a18;
+            --card-border: rgba(255, 255, 255, 0.12);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
-            background-color: #061e47; 
+            background-color: var(--bg-navy);
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 2rem;
-            box-sizing: border-box;
+            padding: 2.5rem 1rem;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
             width: 100%;
-            max-width: 600px;
+            max-width: 680px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
 
-        h2 { margin-top: 0; font-weight: 400; }
-        h2 em { color: #F26722; font-style: normal; font-weight: 700; }
+        h2 { margin: 0 0 0.5rem 0; font-size: 1.7rem; font-weight: 800; }
+        h2 em { color: var(--accent-orange); font-style: normal; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
 
+        /* AI GENERATOR TOOLBAR */
+        .ai-toolbar {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .ai-toolbar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #34d399;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .ai-controls {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .ai-select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+        .btn-ai-gen {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ai-gen:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* FORM ELEMENTS */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             display: flex;
             flex-direction: column;
         }
 
         label {
-            margin-bottom: 0.5rem;
-            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.4rem;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
-        input[type="text"], select, textarea {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.8rem;
-            border-radius: 4px;
+        input[type="text"], textarea {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.8rem 1rem;
+            border-radius: 6px;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            width: 100%;
         }
 
-        input[type="text"]:focus, select:focus, textarea:focus {
+        input[type="text"]:focus, textarea:focus {
             outline: none;
-            border-color: #F26722;
+            border-color: var(--accent-orange);
+            background: rgba(0, 0, 0, 0.4);
         }
 
-        /* Dropdown specific styling */
-        select option {
-            background-color: #061e47; 
-            color: white;
+        .options-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .helper-text {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* ACTION BUTTONS */
+        .btn-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
         }
 
         .btn-submit {
-            background: #F26722;
+            background: var(--accent-orange);
             color: #ffffff;
-            font-size: 1.05rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 4px;
+            padding: 0.85rem 2.2rem;
+            border-radius: 6px;
             cursor: pointer;
-            transition: opacity 0.2s ease;
-            margin-top: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(242, 103, 34, 0.3);
         }
-
-        .btn-submit:hover { opacity: 0.9; }
+        .btn-submit:hover {
+            background: var(--accent-orange-hover);
+            transform: translateY(-2px);
+        }
 
         .btn-cancel {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-muted);
             text-decoration: none;
-            margin-left: 1rem;
             font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+            padding: 0.85rem 1rem;
         }
-        
         .btn-cancel:hover { color: #ffffff; }
+
+        @media (max-width: 600px) {
+            .options-row-grid { grid-template-columns: 1fr; }
+            .container { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Add Question to <em>{{ course.course_name }}</em></h2>
-        
+        <h2>{% if question %}Edit Question in{% else %}Add Question to{% endif %} <em>{{ course.course_name }}</em></h2>
+        <p class="subtitle">Provide the question prompt, 4 distinct answer choices, and declare the correct answer.</p>
+
+        <!-- SMART AI GENERATOR -->
+        <div class="ai-toolbar">
+            <div class="ai-toolbar-header">
+                <span class="ai-badge">✨ Smart AI Question Generator</span>
+                <span style="font-size: 0.78rem; color: #a7f3d0;">Auto-populates fields with 1 click</span>
+            </div>
+            <div class="ai-controls">
+                <select id="aiCategory" class="ai-select">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="sql">SQL / Databases</option>
+                    <option value="dsa">Data Structures & Algo</option>
+                    <option value="general">Computer Science Core</option>
+                </select>
+                <button type="button" class="btn-ai-gen" onclick="generateAIQuestion()">
+                    <span>✨ Generate Question</span>
+                </button>
+            </div>
+        </div>
+
         <form method="POST">
             {% csrf_token %}
             
-            {{ form.as_p }}
-            
-            <button type="submit" class="btn-submit">Save Question</button>
-            <a href="{% url 'course_questions' course.id %}" class="btn-cancel">Cancel</a>
-        </form>
+            <div class="form-group">
+                <label for="id_question_text">Question Text</label>
+                {{ form.question_text }}
+            </div>
 
+            <div class="options-row-grid">
+                <div class="form-group">
+                    <label for="id_option1">Option A</label>
+                    {{ form.option1 }}
+                </div>
+                <div class="form-group">
+                    <label for="id_option2">Option B</label>
+                    {{ form.option2 }}
+                </div>
+            </div>
+
+            <div class="options-row-grid">
+                <div class="form-group">
+                    <label for="id_option3">Option C</label>
+                    {{ form.option3 }}
+                </div>
+                <div class="form-group">
+                    <label for="id_option4">Option D</label>
+                    {{ form.option4 }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_correct_answer">Correct Answer</label>
+                {{ form.correct_answer }}
+                <span class="helper-text">Must exactly match one of Option A, B, C, or D text.</span>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn-submit">
+                    {% if question %}Save Changes{% else %}Save Question{% endif %}
+                </button>
+                <a href="{% url 'course_questions' course.id %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        async function generateAIQuestion() {
+            const category = document.getElementById('aiCategory').value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const response = await fetch("{% url 'generate_ai_question_api' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ category: category })
+                });
+
+                const data = await response.json();
+                if (data.status === 'success') {
+                    const q = data.question;
+                    document.getElementById('id_question_text').value = q.question_text;
+                    document.getElementById('id_option1').value = q.option1;
+                    document.getElementById('id_option2').value = q.option2;
+                    document.getElementById('id_option3').value = q.option3;
+                    document.getElementById('id_option4').value = q.option4;
+                    document.getElementById('id_correct_answer').value = q.correct_answer;
+                }
+            } catch (err) {
+                console.error("AI Generation error:", err);
+            }
+        }
+    </script>
 </body>
 </html>
