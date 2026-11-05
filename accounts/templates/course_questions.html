@@ -240,9 +240,8 @@
             </div>
         {% empty %}
             <div class="empty-placeholder">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❓</div>
                 <h3>No Questions Added Yet</h3>
-                <p>Start populating your exam by clicking "+ Add New Question". You can also use our AI generator to author questions in seconds!</p>
+                <p>Start populating your exam by clicking "Add New Question". You can also use our AI generator to author questions in seconds!</p>
                 <a href="{% url 'add_question' course.id %}" class="btn btn-add" style="margin-top: 1rem;">
                     + Add First Question
                 </a>

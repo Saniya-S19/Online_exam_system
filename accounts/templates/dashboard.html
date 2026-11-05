@@ -332,7 +332,7 @@
 
     <main class="main-content">
         <header class="topbar">
-            <span class="student-badge">🎓 {{ request.user.username }}</span>
+            <span class="student-badge"> {{ request.user.username }}</span>
             <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
         </header>
 
@@ -341,7 +341,6 @@
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert-banner {% if message.tags == 'warning' %}alert-warning{% else %}alert-success{% endif %}">
-                        <span>ℹ️</span>
                         <span>{{ message }}</span>
                     </div>
                 {% endfor %}
@@ -384,10 +383,10 @@
 
                 <div class="quick-actions">
                     <button type="button" class="btn-quick" onclick="switchToTab('exams-tab')">
-                        <span>📝 Take an Exam</span>
+                        <span>Take an Exam</span>
                     </button>
                     <button type="button" class="btn-quick" onclick="switchToTab('results-tab')">
-                        <span>📊 View My Results</span>
+                        <span>View My Results</span>
                     </button>
                 </div>
 

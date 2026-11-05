@@ -125,17 +125,7 @@
             gap: 1.25rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .metric-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 10px;
-            background: #ede9fe;
-            color: #6d28d9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-        }
+        
         .metric-info h3 { margin: 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; }
         .metric-info span { font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
 
@@ -288,13 +278,13 @@
         <aside class="sidebar">
             <div class="logo"><em>Nexa</em><span>Test Admin</span></div>
             <ul class="nav-links">
-                <li><a href="{% url 'teacher_dashboard' %}" class="nav-item active"><span>📊 Dashboard</span></a></li>
-                <li><a href="{% url 'add_course' %}" class="nav-item"><span>➕ New Exam</span></a></li>
-                <li><a href="{% url 'export_results_csv' %}" class="nav-item"><span>📥 Export CSV</span></a></li>
+                <li><a href="{% url 'teacher_dashboard' %}" class="nav-item active"><span>Dashboard</span></a></li>
+                <li><a href="{% url 'add_course' %}" class="nav-item"><span>New Exam</span></a></li>
+                <li><a href="{% url 'export_results_csv' %}" class="nav-item"><span>Export CSV</span></a></li>
             </ul>
             <div style="flex: 1;"></div>
             <ul class="nav-links">
-                <li><a href="{% url 'logout' %}" class="nav-item" style="color: #fca5a5;"><span>🚪 Logout</span></a></li>
+                <li><a href="{% url 'logout' %}" class="nav-item" style="color: #fca5a5;"><span>Logout</span></a></li>
             </ul>
         </aside>
 
@@ -314,7 +304,6 @@
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert-box">
-                        <span>ℹ️</span>
                         <span>{{ message }}</span>
                     </div>
                 {% endfor %}
@@ -323,21 +312,18 @@
             <!-- METRICS GRID -->
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <div class="metric-icon">👥</div>
                     <div class="metric-info">
                         <h3>{{ total_students }}</h3>
                         <span>Enrolled Students</span>
                     </div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-icon" style="background: #e0f2fe; color: #0284c7;">📝</div>
                     <div class="metric-info">
                         <h3>{{ total_exams_created }}</h3>
                         <span>Exams Created</span>
                     </div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-icon" style="background: #dcfce7; color: #16a34a;">🎯</div>
                     <div class="metric-info">
                         <h3>{{ total_exams_taken }}</h3>
                         <span>Completed Attempts</span>
@@ -385,22 +371,22 @@
                                         </button>
                                         <div class="dropdown-content">
                                             <a href="{% url 'course_questions' course.id %}">
-                                                <span>📋</span> View Questions
+                                                View Questions
                                             </a>
                                             <a href="{% url 'add_question' course.id %}">
-                                                <span>➕</span> Add Questions
+                                                Add Questions
                                             </a>
                                             <a href="{% url 'edit_course' course.id %}">
-                                                <span>✏️</span> Edit Exam Details
+                                                Edit Exam Details
                                             </a>
                                             <a href="{% url 'manage_students' course.id %}">
-                                                <span>👥</span> Manage Students
+                                                Manage Students
                                             </a>
                                             <a href="{% url 'export_results_csv_course' course.id %}">
-                                                <span>📊</span> Export CSV
+                                                Export CSV
                                             </a>
                                             <a href="{% url 'delete_course' course.id %}" class="action-delete">
-                                                <span>🗑️</span> Delete Exam
+                                                Delete Exam
                                             </a>
                                         </div>
                                     </div>
@@ -409,7 +395,7 @@
                         {% empty %}
                             <tr>
                                 <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
-                                    No exams created yet. Click "+ Create New Exam" to author your first assessment!
+                                    No exams created yet. Click "Create New Exam" to author your first assessment!
                                 </td>
                             </tr>
                         {% endfor %}
@@ -427,7 +413,7 @@
                         </p>
                     </div>
                     <a href="{% url 'export_results_csv' %}" class="btn-csv">
-                        <span>📥</span> Download Full CSV
+                         Download Full CSV
                     </a>
                 </div>
 

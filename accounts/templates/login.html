@@ -223,7 +223,7 @@
                 <label>Password</label>
                 <div class="password-wrapper">
                     <input type="password" name="password" id="pwdInput" required>
-                    <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+                    <span class="toggle-eye" onclick="togglePassword()">Show</span>
                 </div>
             </div>
 
@@ -240,10 +240,10 @@
             
             if (pwd.type === "password") {
                 pwd.type = "text";
-                eye.textContent = "🙈"; 
+                eye.textContent = "Hide"; 
             } else {
                 pwd.type = "password";
-                eye.textContent = "👁️"; 
+                eye.textContent = "Show"; 
             }
         }
     </script>

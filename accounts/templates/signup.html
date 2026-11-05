@@ -251,7 +251,7 @@
                 <label>Password</label>
                 <div class="password-wrapper">
                     <input type="password" name="password" id="pwdInput" required oninput="checkStrength()">
-                    <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+                    <span class="toggle-eye" onclick="togglePassword()">Show</span>
                 </div>
                 <!-- Strength Meter -->
                 <div class="strength-meter-container">
@@ -274,10 +274,10 @@
             
             if (pwd.type === "password") {
                 pwd.type = "text";
-                eye.textContent = "🙈"; 
+                eye.textContent = "Hide"; 
             } else {
                 pwd.type = "password";
-                eye.textContent = "👁️"; 
+                eye.textContent = "Show"; 
             }
         }
 
@@ -300,17 +300,17 @@
                 text.textContent = "";
             } else if (strength <= 2) {
                 bar.style.width = "33%";
-                bar.style.backgroundColor = "#ef4444"; // Red
+                bar.style.backgroundColor = "#ef4444";
                 text.textContent = "Weak";
                 text.style.color = "#ef4444";
             } else if (strength === 3 || strength === 4) {
                 bar.style.width = "66%";
-                bar.style.backgroundColor = "#F26722"; // Orange
+                bar.style.backgroundColor = "#F26722"; 
                 text.textContent = "Medium";
                 text.style.color = "#F26722";
             } else {
                 bar.style.width = "100%";
-                bar.style.backgroundColor = "#22c55e"; // Green
+                bar.style.backgroundColor = "#22c55e"; 
                 text.textContent = "Strong";
                 text.style.color = "#22c55e";
             }

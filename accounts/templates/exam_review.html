@@ -449,12 +449,12 @@
 
                     <!-- AI Explanation Button -->
                     <button type="button" class="btn-ai-explain" onclick="toggleExplanation('exp-{{ forloop.counter }}', this)">
-                        <span>✨ Explain with AI</span>
+                        <span>Explain with AI</span>
                     </button>
 
                     <!-- Hidden AI Explanation Panel -->
                     <div class="ai-explanation-panel" id="exp-{{ forloop.counter }}">
-                        <strong>🤖 AI Concept Breakdown:</strong><br>
+                        <strong>AI Concept Breakdown:</strong><br>
                         The correct answer is <strong>"{{ item.question_obj.correct_answer }}"</strong>.
                         {% if item.is_correct %}
                             Great job! Your selection matches the standard curriculum answer. Make sure to keep this fundamental concept reinforced in subsequent modules.
@@ -499,10 +499,10 @@
             const panel = document.getElementById(panelId);
             if (panel.style.display === 'block') {
                 panel.style.display = 'none';
-                btnElement.innerHTML = '<span>✨ Explain with AI</span>';
+                btnElement.innerHTML = '<span>Explain with AI</span>';
             } else {
                 panel.style.display = 'block';
-                btnElement.innerHTML = '<span>✨ Hide AI Explanation</span>';
+                btnElement.innerHTML = '<span>Hide AI Explanation</span>';
             }
         }
 

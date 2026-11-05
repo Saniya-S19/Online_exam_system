@@ -467,10 +467,6 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        .modal-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
 
         .modal-title {
             font-size: 1.4rem;
@@ -579,11 +575,11 @@
             </div>
 
             <div class="badge-warning" id="tab-warning-badge" title="Violations recorded by the AI proctor">
-                <span>⚠️ Tab Switches: <strong id="switch-count">0</strong></span>
+                <span> Tab Switches: <strong id="switch-count">0</strong></span>
             </div>
 
             <div class="timer-box" id="timerBox">
-                <span>⏱️</span>
+                <span>Timer</span>
                 <span id="time-display">--:--</span>
             </div>
         </div>
@@ -651,7 +647,6 @@
             <!-- Progress Card -->
             <div class="sidebar-card">
                 <div class="sidebar-title">
-                    <span>📊</span>
                     <span>Exam Progress</span>
                 </div>
                 <div class="progress-bar-container">
@@ -666,7 +661,6 @@
             <!-- Question Jump Palette -->
             <div class="sidebar-card">
                 <div class="sidebar-title">
-                    <span>🧭</span>
                     <span>Question Navigator</span>
                 </div>
                 <div class="palette-grid">
@@ -681,7 +675,6 @@
             <!-- AI Proctor Camera Feed -->
             <div class="sidebar-card">
                 <div class="sidebar-title">
-                    <span>🤖</span>
                     <span>AI Video Proctor</span>
                 </div>
                 <div class="cam-feed-box" id="camContainer">
@@ -697,7 +690,6 @@
                 </button>
             </div>
 
-            <!-- Submit Button -->
             <button type="button" class="btn-submit-exam" onclick="promptSubmit()">
                 <span>Submit Exam</span>
                 <span>&rarr;</span>
@@ -710,7 +702,6 @@
     <!-- AI PROCTOR WARNING MODAL -->
     <div class="modal-overlay" id="warningModal">
         <div class="modal-box">
-            <div class="modal-icon">⚠️</div>
             <h2 class="modal-title" style="color: #f87171;">AI Proctoring Alert</h2>
             <p class="modal-desc" id="warningDesc">
                 A window blur or tab switch was detected. This incident has been logged. Please keep this exam window focused at all times.
@@ -724,7 +715,6 @@
     <!-- SUBMIT CONFIRMATION MODAL -->
     <div class="modal-overlay" id="submitModal">
         <div class="modal-box">
-            <div class="modal-icon">📝</div>
             <h2 class="modal-title">Ready to Submit?</h2>
             <p class="modal-desc" id="submitSummary">
                 You have answered 0 of {{ questions|length }} questions. Once submitted, your scores will be permanently recorded.
